@@ -1,8 +1,7 @@
 module.exports = (sequelize, DataTypes) => {
   return sequelize.define('team', {
-    name: { type: DataTypes.STRING, unique: true },
-    captainId: { type: DataTypes.UUID },
-    soloTeam: { type: DataTypes.BOOLEAN, defaultValue: false },
+    id: { primaryKey: true, type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4 },
+    name: { type: DataTypes.STRING, unique: true, allowNull: false },
     toornamentID: { type: DataTypes.STRING }
   })
 }
