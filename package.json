@@ -44,5 +44,10 @@
     "serve": "pm2 start ./bin/start.js -i max --wait-ready --name arena.utt.fr-api",
     "reload": "pm2 reload arena.utt.fr-api --update-env",
     "lint": "prettier --single-quote --print-width 100 --tab-width 2 --no-semi --write \"{src,bin}/**/*.js\""
+  },
+  "devDependencies": {
+    "eslint": "^6.4.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.18.2"
   }
 }
