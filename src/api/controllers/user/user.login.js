@@ -39,13 +39,12 @@ module.exports = app => {
     const { User, Network } = req.app.locals.models
 
     try {
-      const username = req.body.username
-      const password = req.body.password
+      const { username, password } = req.body
 
       // Get user
       const user = await User.findOne({
         where: {
-          [Op.or]: [{ username: username }, { email: username }]
+          [Op.or]: [{ username }, { email: username }]
         }
       })
 
