@@ -2,7 +2,7 @@ const isAuth = require('../../middlewares/isAuth')
 const isAdmin = require('../../middlewares/isAdmin')
 const isRespo = require('../../middlewares/isRespo')
 const errorHandler = require('../../utils/errorHandler')
-const isInSpotlight = require('../../utils/isInSpotlight')
+const isInSpotlight = require('../../utils/isInTournament')
 const { outputFields } = require('../../utils/publicFields')
 
 /**

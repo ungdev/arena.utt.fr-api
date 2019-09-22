@@ -32,6 +32,7 @@
     "pm2": "^2.10.4",
     "prettier": "^1.13.4",
     "sequelize": "^5.3.3",
+    "sequelize-cli": "^5.5.1",
     "socket.io": "^2.1.1",
     "svr": "^0.7.0",
     "uuid": "^3.2.1",
