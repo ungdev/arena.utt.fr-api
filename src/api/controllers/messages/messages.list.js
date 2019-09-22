@@ -1,20 +1,20 @@
-const errorHandler = require('../../utils/errorHandler')
-const isAuth = require('../../middlewares/isAuth')
-const Sequelize = require('sequelize')
-const log = require('../../utils/log')(module)
+const Sequelize = require('sequelize');
+const errorHandler = require('../../utils/errorHandler');
+const isAuth = require('../../middlewares/isAuth');
+const log = require('../../utils/log')(module);
 
-module.exports = app => {
-  app.get('/messages', [isAuth()])
+module.exports = (app) => {
+  app.get('/messages', [isAuth()]);
   app.get('/messages', async (req, res) => {
-    const { Message, User, Team, Spotlight } = req.app.locals.models
+    const { Message, User, Team, Spotlight } = req.app.locals.models;
     try {
-      let messages = await Message.findAll({
+      const messages = await Message.findAll({
         order: [['createdAt', 'ASC']],
         attributes: ['message'],
         where: {
           [Sequelize.Op.or]: [
             { senderId: req.user.id },
-            { receiverId: req.user.id }
+            { receiverId: req.user.id },
           ],
         },
         include: [
@@ -29,39 +29,40 @@ module.exports = app => {
                 include: [
                   {
                     model: Spotlight,
-                    attributes: ['id', 'name']
-                  }
-                ]
-              }
-            ]
+                    attributes: ['id', 'name'],
+                  },
+                ],
+              },
+            ],
           },
           {
             model: User,
             as: 'To',
             attributes: ['id', 'name'],
-          }
-        ]
-      })
+          },
+        ],
+      });
       return res
         .status(200)
         .json(messages)
-        .end()
-    } catch (err) {
-      errorHandler(err, res)
+        .end();
     }
-  })
+    catch (err) {
+      errorHandler(err, res);
+    }
+  });
 
   app.get('/messages/:id', async (req, res) => {
-    const { Message, User, Team, Spotlight } = req.app.locals.models
+    const { Message, User, Team, Spotlight } = req.app.locals.models;
 
     try {
-      let messages = await Message.findAll({
+      const messages = await Message.findAll({
         order: [['createdAt', 'ASC']],
         where: {
           [Sequelize.Op.or]: [
             { senderId: req.params.id },
-            { receiverId: req.params.id }
-          ]
+            { receiverId: req.params.id },
+          ],
         },
         include: [
           {
@@ -75,20 +76,21 @@ module.exports = app => {
                 include: [
                   {
                     model: Spotlight,
-                    attributes: ['id', 'name']
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      })
+                    attributes: ['id', 'name'],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
       return res
         .status(200)
         .json(messages)
-        .end()
-    } catch (err) {
-      errorHandler(err, res)
+        .end();
     }
-  })
-}
+    catch (err) {
+      errorHandler(err, res);
+    }
+  });
+};

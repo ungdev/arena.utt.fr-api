@@ -1,9 +1,9 @@
-const isAuth = require('../../middlewares/isAuth')
-const isAdmin = require('../../middlewares/isAdmin')
-const isRespo = require('../../middlewares/isRespo')
-const errorHandler = require('../../utils/errorHandler')
-const isInSpotlight = require('../../utils/isInTournament')
-const { outputFields } = require('../../utils/publicFields')
+const isAuth = require('../../middlewares/isAuth');
+const isAdmin = require('../../middlewares/isAdmin');
+const isRespo = require('../../middlewares/isRespo');
+const errorHandler = require('../../utils/errorHandler');
+const isInSpotlight = require('../../utils/isInTournament');
+const { outputFields } = require('../../utils/publicFields');
 
 /**
  * GET /user
@@ -18,73 +18,73 @@ const { outputFields } = require('../../utils/publicFields')
  *    prices: Object
  * }
  */
-module.exports = app => {
-  app.get('/spotlights/:id/teams', [isAuth()])
+module.exports = (app) => {
+  app.get('/spotlights/:id/teams', [isAuth()]);
 
   app.get('/spotlights/:id/teams', async (req, res) => {
-    const { Team, User, AskingUser } = req.app.locals.models
+    const { Team, User, AskingUser } = req.app.locals.models;
 
     try {
       let teams = await Team.findAll({
         where: { spotlightId: req.params.id },
         include: [
           {
-            model: User
+            model: User,
           },
           {
             model: User,
             through: AskingUser,
-            as: 'AskingUser'
-          }
-        ]
-      })
-      if(!teams) return res.status(404).json('SPOTLIGHT_NOT_FOUND').end()
-      teams = await Promise.all(teams.map(async team => {
-        team = team.toJSON()
+            as: 'AskingUser',
+          },
+        ],
+      });
+      if (!teams) return res.status(404).json('SPOTLIGHT_NOT_FOUND').end();
+      teams = await Promise.all(teams.map(async (team) => {
+        team = team.toJSON();
         if (team.AskingUser) {
-          team.askingUsers = team.AskingUser.map(teamUser => {
+          team.askingUsers = team.AskingUser.map((teamUser) => {
             // clean the user
-            const cleanedUser = outputFields(teamUser)
+            const cleanedUser = outputFields(teamUser);
 
             // add data from join table
-            cleanedUser.askingMessage = teamUser.askingUser.message
+            cleanedUser.askingMessage = teamUser.askingUser.message;
 
-            return cleanedUser
-          })
+            return cleanedUser;
+          });
 
-          delete team.AskingUser
+          delete team.AskingUser;
         }
-        team.isInSpotlight = await isInSpotlight(team.id, req)
+        team.isInSpotlight = await isInSpotlight(team.id, req);
 
-        let isRespo = false
+        let isRespo = false;
 
-        if(req.user && req.user.permission) {
-          if(req.user.permission.admin) {
-            isRespo = true
+        if (req.user && req.user.permission) {
+          if (req.user.permission.admin) {
+            isRespo = true;
           }
-          else if(req.user.permission.respo && req.user.permission.respo.includes(req.params.id)) {
-            isRespo = true
+          else if (req.user.permission.respo && req.user.permission.respo.includes(req.params.id)) {
+            isRespo = true;
           }
         }
 
         return {
           ...team,
-          users: team.users.map(user => {
-            return {
-              id: user.id,
-              name: user.name,
-              role: user.role,
-              // If respo, returns the user's place otherwise, nothing. If he isn't placed, returns /
-              place: isRespo ? (user.tableLetter != null ? user.tableLetter + user.placeNumber : '/') : ''
-            }})
-        }
-      }))
+          users: team.users.map((user) => ({
+            id: user.id,
+            name: user.name,
+            role: user.role,
+            // If respo, returns the user's place otherwise, nothing. If he isn't placed, returns /
+            place: isRespo ? (user.tableLetter != null ? user.tableLetter + user.placeNumber : '/') : '',
+          })),
+        };
+      }));
       return res
         .status(200)
         .json(teams)
-        .end()
-    } catch (err) {
-      errorHandler(err, res)
+        .end();
     }
-  })
-}
+    catch (err) {
+      errorHandler(err, res);
+    }
+  });
+};

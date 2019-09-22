@@ -3,13 +3,13 @@
  */
 class ExtendableError extends Error {
   constructor({ message, errors, status, isPublic, stack }) {
-    super(message)
-    this.name = this.constructor.name
-    this.message = message
-    this.errors = errors
-    this.status = status
-    this.isPublic = isPublic
-    this.stack = stack
+    super(message);
+    this.name = this.constructor.name;
+    this.message = message;
+    this.errors = errors;
+    this.status = status;
+    this.isPublic = isPublic;
+    this.stack = stack;
     // Error.captureStackTrace(this, this.constructor.name)
   }
 }
@@ -26,8 +26,8 @@ class APIError extends ExtendableError {
    * @param {boolean} isPublic - Whether the message should be visible to user or not.
    */
   constructor({ message, errors, stack, status = 500, isPublic = false }) {
-    super({ message, errors, status, isPublic, stack })
+    super({ message, errors, status, isPublic, stack });
   }
 }
 
-module.exports = APIError
+module.exports = APIError;

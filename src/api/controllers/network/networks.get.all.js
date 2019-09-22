@@ -1,14 +1,14 @@
-const errorHandler = require('../../utils/errorHandler')
+const errorHandler = require('../../utils/errorHandler');
 
 /**
  * get /networks
  *
  * Response:
- * 
+ *
  */
-module.exports = app => {
+module.exports = (app) => {
   app.get('/networks', async (req, res) => {
-    const { Network, User, Team, Spotlight } = req.app.locals.models
+    const { Network, User, Team, Spotlight } = req.app.locals.models;
     try {
       let nws = await Network.findAll({
         include: [
@@ -23,23 +23,23 @@ module.exports = app => {
                   {
                     model: Spotlight,
                     attributes: ['id', 'shortName'],
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      })
-      nws = nws.map(nw => {
-        const { user } = nw
-        let spotlight = null
-        let place = null
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+      nws = nws.map((nw) => {
+        const { user } = nw;
+        let spotlight = null;
+        let place = null;
         if (user) {
-          spotlight = 'libre'
-          if(user.team && user.team.spotlight) spotlight = user.team.spotlight.shortName
-          if(!spotlight) spotlight = 'libre'
-          if(spotlight === 'SSBU') spotlight = 'libre'
-          place = user.tableLetter && user.placeNumber ? `${user.tableLetter}${user.placeNumber}` : null
+          spotlight = 'libre';
+          if (user.team && user.team.spotlight) spotlight = user.team.spotlight.shortName;
+          if (!spotlight) spotlight = 'libre';
+          if (spotlight === 'SSBU') spotlight = 'libre';
+          place = user.tableLetter && user.placeNumber ? `${user.tableLetter}${user.placeNumber}` : null;
         }
         return {
           name: user ? user.name : null,
@@ -53,15 +53,16 @@ module.exports = app => {
           switchPort: nw.switchPort,
           isCaster: nw.isCaster,
           isBanned: nw.isBanned,
-        }
-      })
-      
+        };
+      });
+
       res
         .status(200)
         .json(nws)
-        .end() // everything's fine
-    } catch (err) {
-      errorHandler(err, res)
+        .end(); // everything's fine
     }
-  })
-}
+    catch (err) {
+      errorHandler(err, res);
+    }
+  });
+};

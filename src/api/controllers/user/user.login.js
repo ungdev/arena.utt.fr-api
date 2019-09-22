@@ -1,14 +1,14 @@
-const { check } = require('express-validator/check')
-const bcrypt = require('bcryptjs')
-const jwt = require('jsonwebtoken')
-const { Op } = require('sequelize')
+const { check } = require('express-validator/check');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const { Op } = require('sequelize');
 
-const env = require('../../../env')
-const log = require('../../utils/log')(module)
-const errorHandler = require('../../utils/errorHandler')
-const { outputFields } = require('../../utils/publicFields')
-const validateBody = require('../../middlewares/validateBody')
-const isLoginEnabled = require('../../middlewares/isLoginEnabled')
+const env = require('../../../env');
+const log = require('../../utils/log')(module);
+const errorHandler = require('../../utils/errorHandler');
+const { outputFields } = require('../../utils/publicFields');
+const validateBody = require('../../middlewares/validateBody');
+const isLoginEnabled = require('../../middlewares/isLoginEnabled');
 
 /**
  * PUT /user/login
@@ -23,8 +23,8 @@ const isLoginEnabled = require('../../middlewares/isLoginEnabled')
  *    token: String
  * }
  */
-module.exports = app => {
-  app.put('/user/login', [isLoginEnabled()])
+module.exports = (app) => {
+  app.put('/user/login', [isLoginEnabled()]);
 
   app.put('/user/login', [
     check('username')
@@ -32,68 +32,69 @@ module.exports = app => {
       .matches(/[0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzªµºÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿĄąĆćĘęıŁłŃńŒœŚśŠšŸŹźŻżŽžƒˆˇˉμﬁﬂ \-]+/i),
     check('password')
       .exists(),
-    validateBody()
-  ])
+    validateBody(),
+  ]);
 
   app.put('/user/login', async (req, res) => {
-    const { User, Network } = req.app.locals.models
+    const { User, Network } = req.app.locals.models;
 
     try {
-      const username = req.body.username
-      const password = req.body.password
+      const { username } = req.body;
+      const { password } = req.body;
 
       // Get user
       const user = await User.findOne({
         where: {
-          [Op.or]: [{ username: username }, { email: username }]
-        }
-      })
+          [Op.or]: [{ username }, { email: username }],
+        },
+      });
 
       if (!user) {
-        log.warn(`user ${username} couldn't be found`)
+        log.warn(`user ${username} couldn't be found`);
 
         return res
           .status(400)
           .json({ error: 'INVALID_USERNAME' })
-          .end()
+          .end();
       }
 
       // Check for password
-      const passwordMatches = await bcrypt.compare(password, user.password)
+      const passwordMatches = await bcrypt.compare(password, user.password);
 
       if (!passwordMatches) {
-        log.warn(`user ${username} password didn't match`)
+        log.warn(`user ${username} password didn't match`);
 
         return res
           .status(400)
           .json({ error: 'INVALID_PASSWORD' })
-          .end()
+          .end();
       }
 
       // Check if account is activated
       if (user.registerToken) {
-        log.warn(`user ${username} tried to login before activating`)
+        log.warn(`user ${username} tried to login before activating`);
 
         return res
           .status(400)
           .json({ error: 'USER_NOT_ACTIVATED' })
-          .end()
+          .end();
       }
 
       // Generate new token
       const token = jwt.sign({ id: user.id }, env.ARENA_API_SECRET, {
-        expiresIn: env.ARENA_API_SECRET_EXPIRES
-      })
+        expiresIn: env.ARENA_API_SECRET_EXPIRES,
+      });
 
 
-      log.info(`user ${user.name} logged`)
+      log.info(`user ${user.name} logged`);
 
       res
         .status(200)
         .json({ user: outputFields(user), token })
-        .end()
-    } catch (err) {
-      errorHandler(err, res)
+        .end();
     }
-  })
-}
+    catch (err) {
+      errorHandler(err, res);
+    }
+  });
+};

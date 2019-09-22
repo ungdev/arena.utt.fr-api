@@ -1,11 +1,11 @@
-const bcrypt = require('bcryptjs')
-const { check } = require('express-validator/check')
-const validateBody = require('../../middlewares/validateBody')
-const isAuth = require('../../middlewares/isAuth')
-const env = require('../../../env')
-const errorHandler = require('../../utils/errorHandler')
-const { outputFields, inputFields } = require('../../utils/publicFields')
-const log = require('../../utils/log')(module)
+const bcrypt = require('bcryptjs');
+const { check } = require('express-validator/check');
+const validateBody = require('../../middlewares/validateBody');
+const isAuth = require('../../middlewares/isAuth');
+const env = require('../../../env');
+const errorHandler = require('../../utils/errorHandler');
+const { outputFields, inputFields } = require('../../utils/publicFields');
+const log = require('../../utils/log')(module);
 
 /**
  * PUT /user
@@ -20,8 +20,8 @@ const log = require('../../utils/log')(module)
  *    user: User
  * }
  */
-module.exports = app => {
-  app.put('/user', [isAuth('user-edit')])
+module.exports = (app) => {
+  app.put('/user', [isAuth('user-edit')]);
 
   app.put('/user', [
     check('name')
@@ -45,30 +45,31 @@ module.exports = app => {
     check('email')
       .exists()
       .isEmail(),
-    validateBody()
-  ])
+    validateBody(),
+  ]);
 
   app.put('/user', async (req, res) => {
     try {
       if (req.body.password) {
         req.body.password = await bcrypt.hash(
           req.body.password,
-          parseInt(env.ARENA_API_BCRYPT_LEVEL, 10)
-        )
+          parseInt(env.ARENA_API_BCRYPT_LEVEL, 10),
+        );
       }
 
-      const body = inputFields(req.body)
+      const body = inputFields(req.body);
 
-      await req.user.update(body)
+      await req.user.update(body);
 
-      log.info(`user ${req.body.name} updated`)
+      log.info(`user ${req.body.name} updated`);
 
       res
         .status(200)
         .json({ user: outputFields(req.user) })
-        .end()
-    } catch (err) {
-      errorHandler(err, res)
+        .end();
     }
-  })
-}
+    catch (err) {
+      errorHandler(err, res);
+    }
+  });
+};

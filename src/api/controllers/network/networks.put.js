@@ -1,37 +1,38 @@
-const errorHandler = require('../../utils/errorHandler')
-const { check } = require('express-validator/check')
-const validateBody = require('../../middlewares/validateBody')
+const { check } = require('express-validator/check');
+const errorHandler = require('../../utils/errorHandler');
+const validateBody = require('../../middlewares/validateBody');
 
 /**
  * put /networks/@mac
  *
  * Response:
- * 
+ *
  */
-module.exports = app => {
+module.exports = (app) => {
   app.put('/networks/:mac', [
     check('switchId')
       .exists(),
     check('switchPort')
       .exists(),
-    validateBody()
-  ])
+    validateBody(),
+  ]);
   app.put('/networks/:mac', async (req, res) => {
-    const { Network } = req.app.locals.models
-    const { mac } = req.params
-    const { switchId, switchPort } = req.body
+    const { Network } = req.app.locals.models;
+    const { mac } = req.params;
+    const { switchId, switchPort } = req.body;
     try {
-      const nw = await Network.findOne({ where: { mac } })
-      if(!nw) return res.status(404).end()
+      const nw = await Network.findOne({ where: { mac } });
+      if (!nw) return res.status(404).end();
       await nw.update({
-        switchId: switchId,
-        switchPort: switchPort
-      })
+        switchId,
+        switchPort,
+      });
       res
         .status(200)
-        .end() // everything's fine
-    } catch (err) {
-      errorHandler(err, res)
+        .end(); // everything's fine
     }
-  })
-}
+    catch (err) {
+      errorHandler(err, res);
+    }
+  });
+};

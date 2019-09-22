@@ -1,8 +1,8 @@
-const isAuth = require('../../middlewares/isAuth')
-const isAdmin = require('../../middlewares/isAdmin')
-const errorHandler = require('../../utils/errorHandler')
-const { check } = require('express-validator/check')
-const validateBody = require('../../middlewares/validateBody')
+const { check } = require('express-validator/check');
+const isAuth = require('../../middlewares/isAuth');
+const isAdmin = require('../../middlewares/isAdmin');
+const errorHandler = require('../../utils/errorHandler');
+const validateBody = require('../../middlewares/validateBody');
 
 
 /**
@@ -13,32 +13,31 @@ const validateBody = require('../../middlewares/validateBody')
  * Response: none
  *
  */
-module.exports = app => {
-  app.put('/admin/renameTeam/:id', [isAuth(), isAdmin()])
+module.exports = (app) => {
+  app.put('/admin/renameTeam/:id', [isAuth(), isAdmin()]);
 
   app.put('/admin/renameTeam/:id', [
-      check('name')
-        .exists()
-        .matches(/^[A-zÀ-ÿ0-9 '#@!&\-$%]{3,}$/i),
-    validateBody()
-  ])
+    check('name')
+      .exists()
+      .matches(/^[A-zÀ-ÿ0-9 '#@!&\-$%]{3,}$/i),
+    validateBody(),
+  ]);
 
   app.put('/admin/renameTeam/:id', async (req, res) => {
-    const { Team } = req.app.locals.models
+    const { Team } = req.app.locals.models;
 
     try {
-
-      let team = await Team.findByPk(req.params.id)
+      const team = await Team.findByPk(req.params.id);
       await team.update({
-        name: req.body.name
-      })
+        name: req.body.name,
+      });
 
       return res
         .status(200)
-        .end()
+        .end();
     }
     catch (err) {
-      errorHandler(err, res)
+      errorHandler(err, res);
     }
-  })
-}
+  });
+};

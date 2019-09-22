@@ -1,7 +1,7 @@
-const isAdmin = require('../../middlewares/isAdmin')
-const errorHandler = require('../../utils/errorHandler')
-const isAuth = require('../../middlewares/isAuth')
-const log = require('../../utils/log')(module)
+const isAdmin = require('../../middlewares/isAdmin');
+const errorHandler = require('../../utils/errorHandler');
+const isAuth = require('../../middlewares/isAuth');
+const log = require('../../utils/log')(module);
 
 /**
  * GET /bouffe/place/:place
@@ -11,26 +11,27 @@ const log = require('../../utils/log')(module)
  *    { id, name, firstname, lastname, email, paid, teamId, spotlightId, permission, orders }, ...
  * ]
  */
-module.exports = app => {
+module.exports = (app) => {
   app.get('/bouffe/place/:place', async (req, res) => {
-    const { User } = req.app.locals.models
+    const { User } = req.app.locals.models;
 
     try {
-      const { place } = req.params
-      if(place.length < 2) return res.status(400).json({ error: 'NOT_A_PLACE' }).end()
-      const letter = place.slice(0, 1)
-      const number = place.slice(1, place.length)
+      const { place } = req.params;
+      if (place.length < 2) return res.status(400).json({ error: 'NOT_A_PLACE' }).end();
+      const letter = place.slice(0, 1);
+      const number = place.slice(1, place.length);
       const user = await User.findOne({
-        where: { placeNumber: number, tableLetter: letter }
-      })
-      if(!user) return res.status(404).json({ error: 'NOT_FOUND' }).end()
+        where: { placeNumber: number, tableLetter: letter },
+      });
+      if (!user) return res.status(404).json({ error: 'NOT_FOUND' }).end();
 
       return res
         .status(200)
-        .json({ name: user.name, firstname: user.firstname})
-        .end()
-    } catch (err) {
-      errorHandler(err, res)
+        .json({ name: user.name, firstname: user.firstname })
+        .end();
     }
-  })
-}
+    catch (err) {
+      errorHandler(err, res);
+    }
+  });
+};

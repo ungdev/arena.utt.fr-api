@@ -1,11 +1,11 @@
-const log = require('../../utils/log')(module)
-const jwt = require('jsonwebtoken')
-const isAuth = require('../../middlewares/isAuth')
-const env = require('../../../env')
-const errorHandler = require('../../utils/errorHandler')
-const { outputFields } = require('../../utils/publicFields')
-const { isTournamentFull, remainingPlaces } = require('../../utils/isFull')
-const isInTournament = require('../../utils/isInTournament')
+const log = require('../../utils/log')(module);
+const jwt = require('jsonwebtoken');
+const isAuth = require('../../middlewares/isAuth');
+const env = require('../../../env');
+const errorHandler = require('../../utils/errorHandler');
+const { outputFields } = require('../../utils/publicFields');
+const { isTournamentFull, remainingPlaces } = require('../../utils/isFull');
+const isInTournament = require('../../utils/isInTournament');
 
 /**
  * GET /user
@@ -20,50 +20,50 @@ const isInTournament = require('../../utils/isInTournament')
  *    prices: Object
  * }
  */
-module.exports = app => {
-  app.get('/user', [isAuth()])
+module.exports = (app) => {
+  app.get('/user', [isAuth()]);
 
   app.get('/user', async (req, res) => {
-    const { User, Tournament, Team, Order, Network } = req.app.locals.models
+    const { User, Tournament, Team, Order, Network } = req.app.locals.models;
 
     try {
       let tournaments = await Tournament.findAll({
         include: [{
           model: Team,
-          include: [User]
-        }]
-      })
+          include: [User],
+        }],
+      });
 
       // Generate new token
       const token = jwt.sign({ id: req.user.id }, env.ARENA_API_SECRET, {
-        expiresIn: env.ARENA_API_SECRET_EXPIRES
-      })
+        expiresIn: env.ARENA_API_SECRET_EXPIRES,
+      });
 
-      let user = req.user.toJSON()
+      const user = req.user.toJSON();
 
 
-      tournaments = tournaments.map(tournament => {
-        tournament = tournament.toJSON()
+      tournaments = tournaments.map((tournament) => {
+        tournament = tournament.toJSON();
 
-        tournament.isFull = isTournamentFull(tournament)
+        tournament.isFull = isTournamentFull(tournament);
 
-        tournament.remainingPlaces = remainingPlaces(tournament)
+        tournament.remainingPlaces = remainingPlaces(tournament);
 
-        return tournament
-      })
+        return tournament;
+      });
 
       // Clean user team
       if (user.team && user.team.users.length > 0) {
-        user.team.users = user.team.users.map(outputFields)
-        user.team.isInTournament = await isInTournament(user.team.id, req)
-        user.team.remainingPlaces = tournaments.find(tournament => tournament.id === user.team.tournament.id).remainingPlaces
+        user.team.users = user.team.users.map(outputFields);
+        user.team.isInTournament = await isInTournament(user.team.id, req);
+        user.team.remainingPlaces = tournaments.find((tournament) => tournament.id === user.team.tournament.id).remainingPlaces;
       }
 
       // Select returned information about user
-      let userData = {
+      const userData = {
         ...outputFields(user),
         team: user.team,
-      }
+      };
 
       /*
       let ip = req.headers['x-forwarded-for']
@@ -71,7 +71,7 @@ module.exports = app => {
       if(ip) {
         ip = ip.split(',')[0]
         const ipTab = ip.split('.')
-        
+
         if(ipTab[0] === '172' && ipTab[1] === '16' && (ipTab[2] === '98' || ipTab[2] === '99')) {
           let network = await Network.findOne({
             where: { ip }
@@ -155,7 +155,7 @@ module.exports = app => {
             log.info(`Could not add user ip, ${ip} does not exist or ip has not updated yet`)
           }
         }
-      }*/
+      } */
 
       return res
         .status(200)
@@ -163,12 +163,12 @@ module.exports = app => {
           user: userData,
           token,
           tournaments,
-          //hasChangedIp
+          // hasChangedIp
         })
-        .end()
+        .end();
     }
     catch (err) {
-      errorHandler(err, res)
+      errorHandler(err, res);
     }
-  })
-}
+  });
+};

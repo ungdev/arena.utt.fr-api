@@ -1,17 +1,18 @@
-const errorHandler = require('../../utils/errorHandler')
+const errorHandler = require('../../utils/errorHandler');
 
 /**
  * get /networks/@mac
  *
  * Response:
- * 
+ *
  */
-module.exports = app => {
+module.exports = (app) => {
   app.get('/networks/:mac', async (req, res) => {
-    const { Network, User, Team, Spotlight } = req.app.locals.models
-    const { mac } = req.params
+    const { Network, User, Team, Spotlight } = req.app.locals.models;
+    const { mac } = req.params;
     try {
-      const nw = await Network.findOne({ where: { mac }, include: [
+      const nw = await Network.findOne({ where: { mac },
+        include: [
           {
             model: User,
             attributes: ['id', 'name', 'firstname', 'lastname'],
@@ -23,20 +24,20 @@ module.exports = app => {
                   {
                     model: Spotlight,
                     attributes: ['id', 'shortName'],
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      })
-      if(!nw) return res.status(404).end()
-      if(!nw.user) return res.status(407).end()
-      const { user } = nw
-      let spotlight = 'libre'
-      if(user.team && user.team.spotlight) spotlight = user.team.spotlight.shortName
-      if(!spotlight) spotlight = 'libre'
-      if(spotlight === 'SSBU') spotlight = 'libre'
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+      if (!nw) return res.status(404).end();
+      if (!nw.user) return res.status(407).end();
+      const { user } = nw;
+      let spotlight = 'libre';
+      if (user.team && user.team.spotlight) spotlight = user.team.spotlight.shortName;
+      if (!spotlight) spotlight = 'libre';
+      if (spotlight === 'SSBU') spotlight = 'libre';
       res
         .status(200)
         .json({
@@ -52,9 +53,10 @@ module.exports = app => {
           isCaster: nw.isCaster,
           isBanned: nw.isBanned,
         })
-        .end() // everything's fine
-    } catch (err) {
-      errorHandler(err, res)
+        .end(); // everything's fine
     }
-  })
-}
+    catch (err) {
+      errorHandler(err, res);
+    }
+  });
+};

@@ -1,6 +1,6 @@
-const isAdmin = require('../../middlewares/isAdmin')
-const isAuth = require('../../middlewares/isAuth')
-const errorHandler = require('../../utils/errorHandler')
+const isAdmin = require('../../middlewares/isAdmin');
+const isAuth = require('../../middlewares/isAuth');
+const errorHandler = require('../../utils/errorHandler');
 
 /**
  * PUT /admin/setAdmin/:id
@@ -8,52 +8,52 @@ const errorHandler = require('../../utils/errorHandler')
  * Response: none
  *
  */
-module.exports = app => {
-  app.put('/admin/setAdmin/:id', [isAuth(), isAdmin()])
+module.exports = (app) => {
+  app.put('/admin/setAdmin/:id', [isAuth(), isAdmin()]);
 
   app.put('/admin/setAdmin/:id', async (req, res) => {
-    const { Permission } = req.app.locals.models
+    const { Permission } = req.app.locals.models;
 
     try {
-      if(req.body.admin === null) {
+      if (req.body.admin === null) {
         return res
-          .status(400)  // Bad request
+          .status(400) // Bad request
           .json({ error: 'BAD_REQUEST' })
-          .end()
+          .end();
       }
-      else if(req.params.id === req.user.id) {
+      if (req.params.id === req.user.id) {
         return res
-          .status(403)  // Forbidden
+          .status(403) // Forbidden
           .json({ error: 'NOT_ALLOWED' })
-          .end()
+          .end();
       }
 
       let permission = await Permission.find({
-        where: { userId: req.params.id }
-      })
+        where: { userId: req.params.id },
+      });
 
-      if(permission) {
-        permission.admin = req.body.admin
-        await permission.save()
+      if (permission) {
+        permission.admin = req.body.admin;
+        await permission.save();
       }
       else {
         permission = await Permission.create({
           userId: req.params.id,
           admin: req.body.admin,
-          respo: null
-        })
+          respo: null,
+        });
       }
 
-      if((!permission.admin || permission.admin === 0) && !permission.respo) {
-        permission.destroy()
+      if ((!permission.admin || permission.admin === 0) && !permission.respo) {
+        permission.destroy();
       }
 
       return res
         .status(200)
-        .end()
+        .end();
     }
     catch (err) {
-      errorHandler(err, res)
+      errorHandler(err, res);
     }
-  })
-}
+  });
+};

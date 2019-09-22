@@ -1,10 +1,10 @@
-const errorHandler = require('../../utils/errorHandler')
-const isAuth = require('../../middlewares/isAuth')
-const isAdmin = require('../../middlewares/isAdmin')
-const log = require('../../utils/log')(module)
+const errorHandler = require('../../utils/errorHandler');
+const isAuth = require('../../middlewares/isAuth');
+const isAdmin = require('../../middlewares/isAdmin');
+const log = require('../../utils/log')(module);
 
-module.exports = app => {
-  app.get('/conversations', [isAuth()])
+module.exports = (app) => {
+  app.get('/conversations', [isAuth()]);
   app.get('/conversations', async (req, res) => {
     const {
       Conversation,
@@ -12,21 +12,23 @@ module.exports = app => {
       Team,
       Spotlight,
       Permission,
-      Message
-    } = req.app.locals.models
+      Message,
+    } = req.app.locals.models;
     const user = await User.findByPk(req.user.id, {
-      include: [Permission]
-    })
-    if (!user)
+      include: [Permission],
+    });
+    if (!user) {
       return res
         .status(404)
         .json('NOT_FOUND')
-        .end()
-    if (!user.permission)
+        .end();
+    }
+    if (!user.permission) {
       return res
         .status(401)
         .json('NOT_ALLOWED')
-        .end()
+        .end();
+    }
 
     // If user is admin, display all convers
     if (user && user.permission && user.permission.admin) {
@@ -46,43 +48,43 @@ module.exports = app => {
                   include: [
                     {
                       model: Spotlight,
-                      attributes: ['name']
-                    }
-                  ]
-                }
-              ]
+                      attributes: ['name'],
+                    },
+                  ],
+                },
+              ],
             },
             {
               model: Message,
               limit: 1,
-              order: [['createdAt', 'DESC']]
-            }
+              order: [['createdAt', 'DESC']],
+            },
           ],
           where: {
-            user1: null
-          }
-        })
+            user1: null,
+          },
+        });
 
 
-        conversations = conversations.filter(conversation => {
-          return conversation.messages.length > 0
-        })
+        conversations = conversations.filter((conversation) => conversation.messages.length > 0);
 
         return res
           .status(200)
           .json(conversations)
-          .end()
-      } catch (err) {
-        errorHandler(err, res)
+          .end();
       }
-    } else {
-      permissions = user.permission.respo.split(',').map(Number)
+      catch (err) {
+        errorHandler(err, res);
+      }
+    }
+    else {
+      permissions = user.permission.respo.split(',').map(Number);
       conversations = await Conversation.findAll({
         order: [['createdAt', 'DESC']],
         attributes: ['user1', 'user2'],
         where: {
           user1: null,
-          spotlightId: permissions
+          spotlightId: permissions,
         },
         include: [
           {
@@ -96,23 +98,23 @@ module.exports = app => {
                 include: [
                   {
                     model: Spotlight,
-                    attributes: ['name']
-                  }
-                ]
-              }
-            ]
+                    attributes: ['name'],
+                  },
+                ],
+              },
+            ],
           },
           {
             model: Message,
             limit: 1,
-            order: [['createdAt', 'DESC']]
-          }
-        ]
-      })
+            order: [['createdAt', 'DESC']],
+          },
+        ],
+      });
       return res
         .status(200)
         .json(conversations)
-        .end()
+        .end();
     }
-  })
-}
+  });
+};

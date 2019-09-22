@@ -1,6 +1,6 @@
-const isAdmin = require('../../middlewares/isAdmin')
-const isAuth = require('../../middlewares/isAuth')
-const errorHandler = require('../../utils/errorHandler')
+const isAdmin = require('../../middlewares/isAdmin');
+const isAuth = require('../../middlewares/isAuth');
+const errorHandler = require('../../utils/errorHandler');
 
 /**
  * PUT /admin/setCaptain/:id (teamId) {
@@ -11,34 +11,34 @@ const errorHandler = require('../../utils/errorHandler')
  *
  */
 
-module.exports = app => {
-  app.put('/admin/setCaptain/:id', [isAuth(), isAdmin()])
+module.exports = (app) => {
+  app.put('/admin/setCaptain/:id', [isAuth(), isAdmin()]);
 
   app.put('/admin/setCaptain/:id', async (req, res) => {
-    const { Team } = req.app.locals.models
+    const { Team } = req.app.locals.models;
 
     try {
       if (req.params.id === null || req.body.userId === null) {
         return res
           .status(400)
           .json({ error: 'BAD_REQUEST' })
-          .end()
+          .end();
       }
 
-      let team = await Team.findOne({
-        where: { id: req.params.id }
-      })
+      const team = await Team.findOne({
+        where: { id: req.params.id },
+      });
 
       await team.update({
-        captainId: req.body.userId
-      })
+        captainId: req.body.userId,
+      });
 
       return res
         .status(200)
-        .end()
+        .end();
     }
     catch (err) {
-      errorHandler(err, res)
+      errorHandler(err, res);
     }
-  })
-}
+  });
+};
