@@ -3,10 +3,11 @@ const path = require('path');
 const mustache = require('mustache');
 const moment = require('moment');
 
-const transporter = require('nodemailer').createTransport(env.ARENA_MAIL_SMTP);
+const nodemailer = require('nodemailer');
 const env = require('../../env');
 const log = require('./log')(module);
 
+const transporter = nodemailer.createTransport(env.ARENA_MAIL_SMTP);
 
 const noTeamHTML = fs.readFileSync(path.join(__dirname, 'remind-no-team-template.html')).toString();
 const unpaidHTML = fs.readFileSync(path.join(__dirname, 'remind-unpaid-template.html')).toString();

@@ -2,8 +2,9 @@ const isAuth = require('../../middlewares/isAuth');
 const isAdmin = require('../../middlewares/isAdmin');
 const isRespo = require('../../middlewares/isRespo');
 const errorHandler = require('../../utils/errorHandler');
-const isInSpotlight = require('../../utils/isInTournament');
+const isInTournament = require('../../utils/isInTournament');
 const { outputFields } = require('../../utils/publicFields');
+
 
 /**
  * GET /user
@@ -54,7 +55,7 @@ module.exports = (app) => {
 
           delete team.AskingUser;
         }
-        team.isInSpotlight = await isInSpotlight(team.id, req);
+        team.isInSpotlight = await isInTournament(team.id, req);
 
         let isRespo = false;
 

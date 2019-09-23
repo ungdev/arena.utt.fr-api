@@ -39,8 +39,7 @@ module.exports = (app) => {
     const { User, Network } = req.app.locals.models;
 
     try {
-      const { username } = req.body;
-      const { password } = req.body;
+      const { username, password } = req.body
 
       // Get user
       const user = await User.findOne({

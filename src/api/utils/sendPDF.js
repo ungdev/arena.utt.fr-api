@@ -3,10 +3,11 @@ const path = require('path');
 
 const PDFDocument = require('pdfkit');
 const bwipjs = require('bwip-js');
-const transporter = require('nodemailer').createTransport(env.ARENA_MAIL_SMTP);
+const nodemailer = require('nodemailer');
 const env = require('../../env');
 const log = require('./log')(module);
 
+const transporter = nodemailer.createTransport(env.ARENA_MAIL_SMTP);
 
 const fond = `data:image/png;base64,${fs.readFileSync(path.join(__dirname, './', 'assets', 'billet-ua.png'), 'base64')}`;
 const mailMessage = `Vous avez acheté votre place pour l'UTT Arena 2018
