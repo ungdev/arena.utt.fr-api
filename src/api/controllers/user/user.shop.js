@@ -1,5 +1,6 @@
 const { check } = require('express-validator/check');
 const { Base64 } = require('js-base64');
+const env = require('../../../env');
 const etupay = require('@ung/node-etupay')({
   id: env.ARENA_ETUPAY_ID,
   url: env.ARENA_ETUPAY_URL,
@@ -7,7 +8,6 @@ const etupay = require('@ung/node-etupay')({
 });
 const validateBody = require('../../middlewares/validateBody');
 const isAuth = require('../../middlewares/isAuth');
-const env = require('../../../env');
 const errorHandler = require('../../utils/errorHandler');
 
 const { Basket } = etupay;

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 const APIError = require('../utils/APIError');
 const log = require('../utils/log')(module);
 const env = require('../../env');
@@ -6,7 +7,7 @@ const env = require('../../env');
  * Error handler. Send stacktrace only during development
  * @public
  */
-const handler = (err, req, res) => {
+const handler = (err, req, res, next) => {
   const response = {
     code: err.status,
     message: err.message,
@@ -30,7 +31,7 @@ const handler = (err, req, res) => {
  * If error is not an instanceOf APIError, convert it.
  * @public
  */
-const converter = (err, req, res) => {
+const converter = (err, req, res, next) => {
   let convertedError = err;
 
   if (!(err instanceof APIError)) {
@@ -48,7 +49,7 @@ const converter = (err, req, res) => {
  * Catch 404 and forward to error handler
  * @public
  */
-const notFound = (req, res) => {
+const notFound = (req, res, next) => {
   const err = new APIError({
     message: 'Not found',
     status: 404,
