@@ -1,3 +1,5 @@
+/* eslint-disable max-len */
+
 const isAdmin = require('../../middlewares/isAdmin');
 const errorHandler = require('../../utils/errorHandler');
 const isAuth = require('../../middlewares/isAuth');
@@ -82,7 +84,7 @@ module.exports = (app) => {
         .end();
     }
     catch (err) {
-      errorHandler(err, res);
+      return errorHandler(err, res);
     }
   });
 };

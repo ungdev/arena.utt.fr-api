@@ -2,10 +2,10 @@ const http = require('http');
 const database = require('./database');
 const socket = require('./socket');
 const arena = require('./arena');
-const env = require('./env');
 const toornament = require('./toornament');
+require('./env');
 
-module.exports = async function (app, express) {
+module.exports = async function (app) {
   const { sequelize, models } = await database();
 
   arena(app);

@@ -68,7 +68,10 @@ module.exports = (app) => {
           .end();
       }
 
-      if (captain.team && captain.team.spotlight && captain.team.users && captain.team.spotlight.perTeam <= captain.team.users.length) {
+      if (
+        captain.team && captain.team.spotlight && captain.team.users
+        && captain.team.spotlight.perTeam <= captain.team.users.length
+      ) {
         return res.status(400).json({ error: 'TEAM_FULL' });
       }
 
@@ -90,7 +93,7 @@ module.exports = (app) => {
         .end();
     }
     catch (err) {
-      errorHandler(err, res);
+      return errorHandler(err, res);
     }
   });
 };

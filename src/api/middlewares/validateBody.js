@@ -15,5 +15,5 @@ module.exports = () => (req, res, next) => {
 
   req.body = matchedData(req);
 
-  next();
+  return next();
 };

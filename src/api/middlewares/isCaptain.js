@@ -10,5 +10,5 @@ module.exports = (route) => (req, res, next) => {
       .end();
   }
 
-  next();
+  return next();
 };

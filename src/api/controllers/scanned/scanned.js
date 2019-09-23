@@ -2,7 +2,6 @@ const isAuth = require('../../middlewares/isAuth');
 const errorHandler = require('../../utils/errorHandler');
 const { isTeamFull } = require('../../utils/isFull');
 const { outputFields } = require('../../utils/publicFields');
-const log = require('../../utils/log')(module);
 
 /**
  * GET /scanned
@@ -49,7 +48,7 @@ module.exports = (app) => {
           let scannedCount = 0;
           const users = team.users.map((user) => {
             if (user.scanned) {
-              scannedCount++;
+              scannedCount += 1;
             }
 
             return outputFields(user);
@@ -75,7 +74,7 @@ module.exports = (app) => {
         .end();
     }
     catch (err) {
-      errorHandler(err, res);
+      return errorHandler(err, res);
     }
   });
 };

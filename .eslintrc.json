@@ -16,7 +16,7 @@
     "rules": {
       "eol-last": ["off"],
       "object-curly-newline": ["off"],
-      "no-param-reassign": ["error", { "props": false }],
+      "no-param-reassign": 0,
       "brace-style": ["error", "stroustrup"]
     }
 }

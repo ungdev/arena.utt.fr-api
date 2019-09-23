@@ -1,6 +1,5 @@
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
-const compress = require('compression');
 const cors = require('cors');
 const helmet = require('helmet');
 const controllers = require('./api/controllers');

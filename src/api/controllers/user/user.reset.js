@@ -58,13 +58,13 @@ module.exports = (app) => {
 
       log.info(`user ${user.name} asked for mail reset`);
 
-      res
+      return res
         .status(200)
         .json({})
         .end();
     }
     catch (err) {
-      errorHandler(err, res);
+      return errorHandler(err, res);
     }
   });
 
@@ -106,13 +106,13 @@ module.exports = (app) => {
 
       log.info(`user ${user.name} reseted his password`);
 
-      res
+      return res
         .status(200)
         .json({})
         .end();
     }
     catch (err) {
-      errorHandler(err, res);
+      return errorHandler(err, res);
     }
   });
 };

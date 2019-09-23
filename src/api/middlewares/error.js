@@ -6,7 +6,7 @@ const env = require('../../env');
  * Error handler. Send stacktrace only during development
  * @public
  */
-const handler = (err, req, res, next) => {
+const handler = (err, req, res) => {
   const response = {
     code: err.status,
     message: err.message,
@@ -30,7 +30,7 @@ const handler = (err, req, res, next) => {
  * If error is not an instanceOf APIError, convert it.
  * @public
  */
-const converter = (err, req, res, next) => {
+const converter = (err, req, res) => {
   let convertedError = err;
 
   if (!(err instanceof APIError)) {
@@ -48,7 +48,7 @@ const converter = (err, req, res, next) => {
  * Catch 404 and forward to error handler
  * @public
  */
-const notFound = (req, res, next) => {
+const notFound = (req, res) => {
   const err = new APIError({
     message: 'Not found',
     status: 404,

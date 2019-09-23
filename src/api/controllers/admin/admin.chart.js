@@ -45,7 +45,10 @@ module.exports = (app) => {
       const start = moment(startBody);
       const end = moment(endBody).add(1, 'day'); // include end date
 
-      totalPaidOrders = totalPaidOrders.filter((order) => moment(order.paid_at).isAfter(start) && moment(order.paid_at).isBefore(end));
+      totalPaidOrders = totalPaidOrders
+        .filter((order) => moment(order.paid_at)
+          .isAfter(start) && moment(order.paid_at)
+          .isBefore(end));
 
       const result = [];
       let format = 'YYYY-MM-DD';
@@ -91,7 +94,7 @@ module.exports = (app) => {
         .end();
     }
     catch (err) {
-      errorHandler(err, res);
+      return errorHandler(err, res);
     }
   });
 };

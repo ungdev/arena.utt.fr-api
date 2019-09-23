@@ -1,5 +1,4 @@
 const env = require('../../../env');
-const log = require('../../utils/log')(module);
 
 /**
  * GET /user/canLogin

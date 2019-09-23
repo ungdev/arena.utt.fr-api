@@ -36,10 +36,10 @@ module.exports = (app) => {
   ]);
 
   app.put('/user/login', async (req, res) => {
-    const { User, Network } = req.app.locals.models;
+    const { User } = req.app.locals.models;
 
     try {
-      const { username, password } = req.body
+      const { username, password } = req.body;
 
       // Get user
       const user = await User.findOne({
@@ -84,16 +84,15 @@ module.exports = (app) => {
         expiresIn: env.ARENA_API_SECRET_EXPIRES,
       });
 
-
       log.info(`user ${user.name} logged`);
 
-      res
+      return res
         .status(200)
         .json({ user: outputFields(user), token })
         .end();
     }
     catch (err) {
-      errorHandler(err, res);
+      return errorHandler(err, res);
     }
   });
 };

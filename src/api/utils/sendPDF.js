@@ -35,7 +35,7 @@ function generateBarcode(user) {
 }
 
 function generatePdf(user, barcode) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const doc = new PDFDocument();
 
     doc.image(fond, 0, 0, { width: doc.page.width, height: doc.page.height });

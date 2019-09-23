@@ -1,20 +1,16 @@
-const jwt = require('jsonwebtoken');
 const { check } = require('express-validator/check');
 const { Base64 } = require('js-base64');
-const validateBody = require('../../middlewares/validateBody');
-const isAuth = require('../../middlewares/isAuth');
-const env = require('../../../env');
-const errorHandler = require('../../utils/errorHandler');
 const etupay = require('@ung/node-etupay')({
   id: env.ARENA_ETUPAY_ID,
   url: env.ARENA_ETUPAY_URL,
   key: env.ARENA_ETUPAY_KEY,
 });
+const validateBody = require('../../middlewares/validateBody');
+const isAuth = require('../../middlewares/isAuth');
+const env = require('../../../env');
+const errorHandler = require('../../utils/errorHandler');
 
 const { Basket } = etupay;
-
-const euro = 100;
-const gender = { H: 'Homme', F: 'Femme' };
 
 /**
  * POST /user/shop
@@ -96,6 +92,8 @@ module.exports = (app) => {
       // save order
       order = await req.app.locals.models.Order.create(order);
       order.setUser(req.user);
+
+      // eslint-disable-next-line max-len
       const data = Base64.encode(JSON.stringify({ userId: req.user.id, isInscription: false, orderId: order.id }));
 
       const basket = new Basket(
@@ -106,33 +104,14 @@ module.exports = (app) => {
         'checkout',
         data,
       );
-      if (order.ethernet) basket.addItem('Cable Ethernet 5m', euro * env.ARENA_PRICES_ETHERNET, 1);
-      if (order.ethernet7) basket.addItem('Cable Ethernet 7m', euro * env.ARENA_PRICES_ETHERNET7, 1);
-      if (order.kaliento) basket.addItem('Location Kaliento', euro * env.ARENA_PRICES_KALIENTO, 1);
-      if (order.mouse) basket.addItem('Location Souris', euro * env.ARENA_PRICES_MOUSE, 1);
-      if (order.keyboard) basket.addItem('Location Clavier', euro * env.ARENA_PRICES_KEYBOARD, 1);
-      if (order.headset) basket.addItem('Location Casque', euro * env.ARENA_PRICES_HEADSET, 1);
-      if (order.screen24) basket.addItem('Location Ecran 24"', euro * env.ARENA_PRICES_SCREEN24, 1);
-      if (order.screen27) basket.addItem('Location Ecran 27"', euro * env.ARENA_PRICES_SCREEN27, 1);
-      if (order.chair) basket.addItem('Location Chaise Gaming', euro * env.ARENA_PRICES_CHAIR, 1);
-      if (order.gamingPC) basket.addItem('Location PC Gaming', euro * env.ARENA_PRICES_GAMING_PC, 1);
-      if (order.streamingPC) basket.addItem('Location PC Streaming', euro * env.ARENA_PRICES_STREAMING_PC, 1);
-      if (order.laptop) basket.addItem('Location PC Portable', euro * env.ARENA_PRICES_LAPTOP, 1);
-      if (order.tombola > 0) basket.addItem('Tombola', euro * env.ARENA_PRICES_TOMBOLA, order.tombola);
-      if (order.shirt !== 'none') {
-        basket.addItem(
-          `T-Shirt ${gender[req.body.shirtGender]} ${req.body.shirtSize}`,
-          euro * env.ARENA_PRICES_SHIRT,
-          1,
-        );
-      }
+
       return res
         .status(200)
         .json({ url: basket.compute() })
         .end();
     }
     catch (err) {
-      errorHandler(err, res);
+      return errorHandler(err, res);
     }
   });
 };

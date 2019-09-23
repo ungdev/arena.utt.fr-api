@@ -1,5 +1,3 @@
-const env = require('../../../env');
-const log = require('../../utils/log')(module);
 const isAuth = require('../../middlewares/isAuth');
 const sendPdf = require('../../utils/sendPDF');
 const errorHandler = require('../../utils/errorHandler');
@@ -22,7 +20,7 @@ module.exports = (app) => {
       return res.status(200).end();
     }
     catch (err) {
-      errorHandler(err, res);
+      return errorHandler(err, res);
     }
   });
 };

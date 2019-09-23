@@ -1,5 +1,3 @@
-const log = require('./log')(module);
-
 const isTeamFull = (team, max, paid = false) => {
   let count;
   if (!team.users) {

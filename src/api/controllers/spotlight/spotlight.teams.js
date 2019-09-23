@@ -1,6 +1,4 @@
 const isAuth = require('../../middlewares/isAuth');
-const isAdmin = require('../../middlewares/isAdmin');
-const isRespo = require('../../middlewares/isRespo');
 const errorHandler = require('../../utils/errorHandler');
 const isInTournament = require('../../utils/isInTournament');
 const { outputFields } = require('../../utils/publicFields');
@@ -75,6 +73,7 @@ module.exports = (app) => {
             name: user.name,
             role: user.role,
             // If respo, returns the user's place otherwise, nothing. If he isn't placed, returns /
+            // eslint-disable-next-line no-nested-ternary
             place: isRespo ? (user.tableLetter != null ? user.tableLetter + user.placeNumber : '/') : '',
           })),
         };
@@ -85,7 +84,7 @@ module.exports = (app) => {
         .end();
     }
     catch (err) {
-      errorHandler(err, res);
+      return errorHandler(err, res);
     }
   });
 };

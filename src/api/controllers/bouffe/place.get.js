@@ -1,7 +1,4 @@
-const isAdmin = require('../../middlewares/isAdmin');
 const errorHandler = require('../../utils/errorHandler');
-const isAuth = require('../../middlewares/isAuth');
-const log = require('../../utils/log')(module);
 
 /**
  * GET /bouffe/place/:place
@@ -31,7 +28,7 @@ module.exports = (app) => {
         .end();
     }
     catch (err) {
-      errorHandler(err, res);
+      return errorHandler(err, res);
     }
   });
 };

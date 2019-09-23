@@ -1,7 +1,6 @@
 const errorHandler = require('../../utils/errorHandler');
 const isRespo = require('../../middlewares/isRespo');
 const isAuth = require('../../middlewares/isAuth');
-const log = require('../../utils/log')(module);
 
 module.exports = (app) => {
   app.delete('/infos/:id/:infoId', [isAuth(), isRespo()]);
@@ -11,7 +10,7 @@ module.exports = (app) => {
     try {
       const info = await Info.findByPk(req.params.infoId);
 
-      if (info.spotlightId !== parseInt(req.params.id)) {
+      if (info.spotlightId !== parseInt(req.params.id, 10)) {
         return res
           .status(400)
           .json({ error: 'BAD_REQUEST' })
@@ -28,7 +27,7 @@ module.exports = (app) => {
         .end();
     }
     catch (err) {
-      errorHandler(err, res);
+      return errorHandler(err, res);
     }
   });
 };

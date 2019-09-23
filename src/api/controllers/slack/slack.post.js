@@ -1,11 +1,10 @@
 const axios = require('axios');
+const bodyParser = require('body-parser');
 const env = require('../../../env');
 const errorHandler = require('../../utils/errorHandler');
 const isAuth = require('../../middlewares/isAuth');
-const log = require('../../utils/log')(module);
 
 const slack = axios.create({ baseURL: env.SLACK_URL });
-const bodyParser = require('body-parser');
 /**
  * GET /spotlights
  * {
@@ -65,7 +64,7 @@ module.exports = (app) => {
         .end();
     }
     catch (err) {
-      errorHandler(err, res);
+      return errorHandler(err, res);
     }
   });
 
@@ -104,7 +103,7 @@ module.exports = (app) => {
         .end();
     }
     catch (err) {
-      errorHandler(err, res);
+      return errorHandler(err, res);
     }
   });
 

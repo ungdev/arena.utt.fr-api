@@ -1,12 +1,11 @@
 const fs = require('fs');
 const path = require('path');
-const log = require('./log')(module);
-const env = require('../../env');
 const mustache = require('mustache');
+const nodemailer = require('nodemailer');
+const env = require('../../env');
+const log = require('./log')(module);
 
-const transporter = require('nodemailer').createTransport(env.ARENA_MAIL_SMTP);
-
-
+const transporter = nodemailer.createTransport(env.ARENA_MAIL_SMTP);
 const infosHTML = fs.readFileSync(path.join(__dirname, 'infos_joueur.html')).toString();
 
 

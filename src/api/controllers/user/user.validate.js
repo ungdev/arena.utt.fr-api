@@ -1,9 +1,6 @@
 const { check } = require('express-validator/check');
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const uuid = require('uuid');
 const validateBody = require('../../middlewares/validateBody');
-const mail = require('../../mail');
 const env = require('../../../env');
 const errorHandler = require('../../utils/errorHandler');
 const log = require('../../utils/log')(module);
@@ -56,13 +53,13 @@ module.exports = (app) => {
 
       log.info(`user ${user.name} logged`);
 
-      res
+      return res
         .status(200)
         .json({ token })
         .end();
     }
     catch (err) {
-      errorHandler(err, res);
+      return errorHandler(err, res);
     }
   });
 };
