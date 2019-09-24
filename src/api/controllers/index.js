@@ -18,7 +18,6 @@ module.exports = (app) => {
           traverseDir(fullPath);
         }
         else if (!fullPath.endsWith('index.js') && fullPath.slice(-3) === '.js') {
-          console.log(fullPath);
           const controller = require(fullPath.slice(0, -3));
           controller(router);
         }
