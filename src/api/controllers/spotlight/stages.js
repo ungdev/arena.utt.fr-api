@@ -1,5 +1,5 @@
 const axios = require('axios');
-const env = require('../../../env');
+
 const errorHandler = require('../../utils/errorHandler');
 const isAuth = require('../../middlewares/isAuth');
 /**
@@ -24,8 +24,8 @@ module.exports = (app) => {
       const { toornamentID } = spotlight.toJSON();
       const resp = await axios.get(`${toornamentID}/stages`,
         {
-          baseURL: env.TOORNAMENT_API,
-          headers: { 'X-Api-Key': env.TOORNAMENT_KEY },
+          baseURL: process.env.TOORNAMENT_API,
+          headers: { 'X-Api-Key': process.env.TOORNAMENT_KEY },
         });
       const stages = resp.data.map((s) => ({ ...s, toornamentID }));
       return res

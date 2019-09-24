@@ -5,7 +5,7 @@ const hash = require('util').promisify(bcrypt.hash);
 const validateBody = require('../../middlewares/validateBody');
 const isLoginEnabled = require('../../middlewares/isLoginEnabled');
 const mail = require('../../mail');
-const env = require('../../../env');
+
 const random = require('../../utils/random');
 const errorHandler = require('../../utils/errorHandler');
 const log = require('../../utils/log')(module);
@@ -52,15 +52,15 @@ module.exports = (app) => {
     const { User } = req.app.locals.models;
 
     try {
-      req.body.barcode = random(env.ARENA_API_BARCODE_LENGTH);
-      req.body.password = await hash(req.body.password, parseInt(env.ARENA_API_BCRYPT_LEVEL, 10));
+      req.body.barcode = random(process.env.ARENA_API_BARCODE_LENGTH);
+      req.body.password = await hash(req.body.password, parseInt(process.env.ARENA_API_BCRYPT_LEVEL, 10));
 
       req.body.registerToken = uuid();
       const user = await User.create(req.body);
 
       await mail('user.register', user.email, {
         mail: user.email,
-        link: `${env.ARENA_WEBSITE}/valid/${user.registerToken}`,
+        link: `${process.env.ARENA_WEBSITE}/valid/${user.registerToken}`,
       });
 
       log.info(`user ${req.body.name} created`);

@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
-const env = require('../../env');
+
 const log = require('../utils/log')(module);
 
 jwt.verify = promisify(jwt.verify);
@@ -20,7 +20,7 @@ module.exports = (route) => async (req, res, next) => {
   }
 
   try {
-    const decoded = await jwt.verify(auth, env.ARENA_API_SECRET);
+    const decoded = await jwt.verify(auth, process.env.ARENA_API_SECRET);
 
     const user = await User.findByPk(decoded.id, {
       include:

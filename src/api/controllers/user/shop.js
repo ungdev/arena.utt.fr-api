@@ -1,10 +1,10 @@
 const { check } = require('express-validator/check');
 const { Base64 } = require('js-base64');
-const env = require('../../../env');
+
 const etupay = require('@ung/node-etupay')({
-  id: env.ARENA_ETUPAY_ID,
-  url: env.ARENA_ETUPAY_URL,
-  key: env.ARENA_ETUPAY_KEY,
+  id: process.env.ARENA_ETUPAY_ID,
+  url: process.env.ARENA_ETUPAY_URL,
+  key: process.env.ARENA_ETUPAY_KEY,
 });
 const validateBody = require('../../middlewares/validateBody');
 const isAuth = require('../../middlewares/isAuth');
@@ -68,7 +68,7 @@ module.exports = (app) => {
   ]);
 
   app.post('/user/shop', async (req, res) => {
-    if (env.ARENA_PAYMENT_DISABLED === '1') return res.status(404).json({ error: 'PAYMENT_DISABLED' }).end();
+    if (process.env.ARENA_PAYMENT_DISABLED === '1') return res.status(404).json({ error: 'PAYMENT_DISABLED' }).end();
     try {
       let order = {};
       order.ethernet = req.body.ethernet ? req.body.ethernet : false;

@@ -1,13 +1,13 @@
-const env = require('../../env');
+
 const log = require('../utils/log')(module);
 const moment = require('moment');
 const sendPdf = require('../utils/sendPDF');
 const { sendInfosMail } = require('../utils/sendMailInfo');
 const { Base64 } = require('js-base64');
 const etupay = require('@ung/node-etupay')({
-  id: env.ARENA_ETUPAY_ID,
-  url: env.ARENA_ETUPAY_URL,
-  key: env.ARENA_ETUPAY_KEY,
+  id: process.env.ARENA_ETUPAY_ID,
+  url: process.env.ARENA_ETUPAY_URL,
+  key: process.env.ARENA_ETUPAY_KEY,
 });
 
 async function leaveTeam(user, Team, User) {
@@ -128,8 +128,8 @@ module.exports = (app) => {
     if (req.query.payload) {
       let { shouldSendMail, user, error, transactionState } = await handlePayload(req.app.locals.models, req.etupay);
       if (error) {
-        if (error === 'ALREADY_PAID') return res.redirect(env.ARENA_ETUPAY_SUCCESSURL);
-        return res.redirect(env.ARENA_ETUPAY_ERRORURL);
+        if (error === 'ALREADY_PAID') return res.redirect(process.env.ARENA_ETUPAY_SUCCESSURL);
+        return res.redirect(process.env.ARENA_ETUPAY_ERRORURL);
       }
       if (!user) {
         return res
@@ -145,11 +145,11 @@ module.exports = (app) => {
         log.info(`Mail sent to ${user.name}`);
       }
       if (transactionState !== 'paid') {
-        log.info(`${user.name} was redirected to ${env.ARENA_ETUPAY_ERRORURL}`);
-        return res.redirect(env.ARENA_ETUPAY_ERRORURL);
+        log.info(`${user.name} was redirected to ${process.env.ARENA_ETUPAY_ERRORURL}`);
+        return res.redirect(process.env.ARENA_ETUPAY_ERRORURL);
       }
-      log.info(`${user.name} was redirected to ${env.ARENA_ETUPAY_SUCCESSURL}`);
-      return res.redirect(env.ARENA_ETUPAY_SUCCESSURL);
+      log.info(`${user.name} was redirected to ${process.env.ARENA_ETUPAY_SUCCESSURL}`);
+      return res.redirect(process.env.ARENA_ETUPAY_SUCCESSURL);
     }
 
     next();

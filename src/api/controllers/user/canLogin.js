@@ -1,4 +1,4 @@
-const env = require('../../../env');
+
 
 /**
  * GET /user/canLogin
@@ -14,6 +14,6 @@ const env = require('../../../env');
 module.exports = (app) => {
   app.get('/user/canLogin', async (req, res) => res
     .status(200)
-    .json({ canLogin: env.ARENA_API_DISABLE_LOGIN === '0' })
+    .json({ canLogin: process.env.ARENA_API_DISABLE_LOGIN === '0' })
     .end());
 };

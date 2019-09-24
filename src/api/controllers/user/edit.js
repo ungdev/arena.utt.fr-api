@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs');
 const { check } = require('express-validator/check');
 const validateBody = require('../../middlewares/validateBody');
 const isAuth = require('../../middlewares/isAuth');
-const env = require('../../../env');
+
 const errorHandler = require('../../utils/errorHandler');
 const { outputFields, inputFields } = require('../../utils/publicFields');
 const log = require('../../utils/log')(module);
@@ -53,7 +53,7 @@ module.exports = (app) => {
       if (req.body.password) {
         req.body.password = await bcrypt.hash(
           req.body.password,
-          parseInt(env.ARENA_API_BCRYPT_LEVEL, 10),
+          parseInt(process.env.ARENA_API_BCRYPT_LEVEL, 10),
         );
       }
 

@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 const APIError = require('../utils/APIError');
 const log = require('../utils/log')(module);
-const env = require('../../env');
+
 
 /**
  * Error handler. Send stacktrace only during development
@@ -15,7 +15,7 @@ const handler = (err, req, res, next) => {
     stack: err.stack,
   };
 
-  if (env.NODE_ENV !== 'development') {
+  if (process.env.NODE_ENV !== 'development') {
     delete response.stack;
   }
 

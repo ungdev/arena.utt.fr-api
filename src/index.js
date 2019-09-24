@@ -3,7 +3,6 @@ const database = require('./database');
 const socket = require('./socket');
 const arena = require('./arena');
 const toornament = require('./toornament');
-require('./env');
 
 module.exports = async function (app) {
   const { sequelize, models } = await database();

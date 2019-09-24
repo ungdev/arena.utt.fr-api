@@ -2,14 +2,14 @@ const jwt = require('jsonwebtoken');
 const { check } = require('express-validator/check');
 const validateBody = require('../../middlewares/validateBody');
 const isAuth = require('../../middlewares/isAuth');
-const env = require('../../../env');
+
 const errorHandler = require('../../utils/errorHandler');
 const log = require('../../utils/log')(module);
 const { Base64 } = require('js-base64');
 const etupay = require('@ung/node-etupay')({
-  id: env.ARENA_ETUPAY_ID,
-  url: env.ARENA_ETUPAY_URL,
-  key: env.ARENA_ETUPAY_KEY,
+  id: process.env.ARENA_ETUPAY_ID,
+  url: process.env.ARENA_ETUPAY_URL,
+  key: process.env.ARENA_ETUPAY_KEY,
 });
 
 const { Basket } = etupay;
@@ -62,7 +62,7 @@ module.exports = (app) => {
   ]);
 
   app.post('/user/pay', async (req, res) => {
-    if (env.ARENA_PAYMENT_DISABLED === '1') {
+    if (process.env.ARENA_PAYMENT_DISABLED === '1') {
       return res
         .status(404)
         .json({ error: 'PAYMENT_DISABLED' })
@@ -91,7 +91,7 @@ module.exports = (app) => {
 
     // Check if LAN is already full
     // TODO : ARENA_MAX_PLAYER_PLACES ??
-    if (totalPaidPlayers >= env.ARENA_MAX_PLACES) {
+    if (totalPaidPlayers >= process.env.ARENA_MAX_PLACES) {
       return res
         .status(404)
         .json({ error: 'LAN_FULL' })
@@ -111,7 +111,7 @@ module.exports = (app) => {
       if (req.body.plusone) {
         const count = await Order.count({ where: { plusone: true, paid: true } });
 
-        if (count >= env.ARENA_VISITOR_LIMIT) {
+        if (count >= process.env.ARENA_VISITOR_LIMIT) {
           return res
             .status(404)
             .json({ error: 'VISITOR_FULL' })
@@ -144,9 +144,9 @@ module.exports = (app) => {
       order.setUser(req.user);
 
       // step 2 : determine price (based on profile + mail)
-      const partnerPrice = env.ARENA_PRICES_PARTNER_MAILS.split(',').some((partner) => req.user.email.toLowerCase().endsWith(partner));
+      const partnerPrice = process.env.ARENA_PRICES_PARTNER_MAILS.split(',').some((partner) => req.user.email.toLowerCase().endsWith(partner));
       const data = Base64.encode(JSON.stringify({ userId: req.user.id, isInscription: true, orderId: order.id }));
-      const price = partnerPrice ? env.ARENA_PRICES_PARTNER : env.ARENA_PRICES_DEFAULT;
+      const price = partnerPrice ? process.env.ARENA_PRICES_PARTNER : process.env.ARENA_PRICES_DEFAULT;
       const basket = new Basket(
         'Inscription UTT Arena 2018',
         req.user.firstname,
@@ -159,30 +159,30 @@ module.exports = (app) => {
       if (req.body.plusone) {
         basket.addItem(
           'Place UTT Arena Visiteur/Accompagnateur',
-          euro * env.ARENA_PRICES_PLUSONE,
+          euro * process.env.ARENA_PRICES_PLUSONE,
           1,
         );
       }
       else {
         basket.addItem('Place UTT Arena', euro * price, 1);
       }
-      if (order.ethernet) basket.addItem('Cable Ethernet 5m', euro * env.ARENA_PRICES_ETHERNET, 1);
-      if (order.ethernet7) basket.addItem('Cable Ethernet 7m', euro * env.ARENA_PRICES_ETHERNET7, 1);
-      if (order.kaliento) basket.addItem('Location Kaliento', euro * env.ARENA_PRICES_KALIENTO, 1);
-      if (order.mouse) basket.addItem('Location Souris', euro * env.ARENA_PRICES_MOUSE, 1);
-      if (order.keyboard) basket.addItem('Location Clavier', euro * env.ARENA_PRICES_KEYBOARD, 1);
-      if (order.headset) basket.addItem('Location Casque', euro * env.ARENA_PRICES_HEADSET, 1);
-      if (order.screen24) basket.addItem('Location Ecran 24"', euro * env.ARENA_PRICES_SCREEN24, 1);
-      if (order.screen27) basket.addItem('Location Ecran 27"', euro * env.ARENA_PRICES_SCREEN27, 1);
-      if (order.chair) basket.addItem('Location Chaise Gaming', euro * env.ARENA_PRICES_CHAIR, 1);
-      if (order.gamingPC) basket.addItem('Location PC Gaming', euro * env.ARENA_PRICES_GAMING_PC, 1);
-      if (order.streamingPC) basket.addItem('Location PC Streaming', euro * env.ARENA_PRICES_STREAMING_PC, 1);
-      if (order.laptop) basket.addItem('Location PC Portable', euro * env.ARENA_PRICES_LAPTOP, 1);
-      if (order.tombola > 0) basket.addItem('Tombola', euro * env.ARENA_PRICES_TOMBOLA, order.tombola);
+      if (order.ethernet) basket.addItem('Cable Ethernet 5m', euro * process.env.ARENA_PRICES_ETHERNET, 1);
+      if (order.ethernet7) basket.addItem('Cable Ethernet 7m', euro * process.env.ARENA_PRICES_ETHERNET7, 1);
+      if (order.kaliento) basket.addItem('Location Kaliento', euro * process.env.ARENA_PRICES_KALIENTO, 1);
+      if (order.mouse) basket.addItem('Location Souris', euro * process.env.ARENA_PRICES_MOUSE, 1);
+      if (order.keyboard) basket.addItem('Location Clavier', euro * process.env.ARENA_PRICES_KEYBOARD, 1);
+      if (order.headset) basket.addItem('Location Casque', euro * process.env.ARENA_PRICES_HEADSET, 1);
+      if (order.screen24) basket.addItem('Location Ecran 24"', euro * process.env.ARENA_PRICES_SCREEN24, 1);
+      if (order.screen27) basket.addItem('Location Ecran 27"', euro * process.env.ARENA_PRICES_SCREEN27, 1);
+      if (order.chair) basket.addItem('Location Chaise Gaming', euro * process.env.ARENA_PRICES_CHAIR, 1);
+      if (order.gamingPC) basket.addItem('Location PC Gaming', euro * process.env.ARENA_PRICES_GAMING_PC, 1);
+      if (order.streamingPC) basket.addItem('Location PC Streaming', euro * process.env.ARENA_PRICES_STREAMING_PC, 1);
+      if (order.laptop) basket.addItem('Location PC Portable', euro * process.env.ARENA_PRICES_LAPTOP, 1);
+      if (order.tombola > 0) basket.addItem('Tombola', euro * process.env.ARENA_PRICES_TOMBOLA, order.tombola);
       if (order.shirt !== 'none') {
         basket.addItem(
           `T-Shirt ${gender[req.body.shirtGender]} ${req.body.shirtSize}`,
-          euro * env.ARENA_PRICES_SHIRT,
+          euro * process.env.ARENA_PRICES_SHIRT,
           1,
         );
       }

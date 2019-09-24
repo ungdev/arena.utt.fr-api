@@ -1,7 +1,7 @@
 const { check } = require('express-validator/check');
 const jwt = require('jsonwebtoken');
 const validateBody = require('../../middlewares/validateBody');
-const env = require('../../../env');
+
 const errorHandler = require('../../utils/errorHandler');
 const log = require('../../utils/log')(module);
 
@@ -47,8 +47,8 @@ module.exports = (app) => {
 
       log.info(`user ${user.name} was validated`);
 
-      const token = jwt.sign({ id: user.id }, env.ARENA_API_SECRET, {
-        expiresIn: env.ARENA_API_SECRET_EXPIRES,
+      const token = jwt.sign({ id: user.id }, process.env.ARENA_API_SECRET, {
+        expiresIn: process.env.ARENA_API_SECRET_EXPIRES,
       });
 
       log.info(`user ${user.name} logged`);

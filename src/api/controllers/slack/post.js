@@ -1,10 +1,10 @@
 const axios = require('axios');
 const bodyParser = require('body-parser');
-const env = require('../../../env');
+
 const errorHandler = require('../../utils/errorHandler');
 const isAuth = require('../../middlewares/isAuth');
 
-const slack = axios.create({ baseURL: env.SLACK_URL });
+const slack = axios.create({ baseURL: process.env.SLACK_URL });
 /**
  * GET /spotlights
  * {
@@ -26,7 +26,7 @@ module.exports = (app) => {
           .json({ error: 'missing params' })
           .end();
       }
-      const channel = env.SLACK_CHANNEL_UA_GLOBAL;
+      const channel = process.env.SLACK_CHANNEL_UA_GLOBAL;
       // switch (req.body.toChannel) {
       //   case "1":
       //     channel = env.SLACK_CHANNEL_UA_TOURNOI_LOL

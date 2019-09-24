@@ -2,7 +2,7 @@ const fs = require('fs');
 const nodemailer = require('nodemailer');
 const path = require('path');
 const mustache = require('mustache');
-const env = require('../../env');
+
 
 const templates = fs
   .readdirSync(__dirname)
@@ -28,10 +28,10 @@ module.exports = async (name, to, data) => {
     throw new Error(`Cannot find template ${name}`);
   }
 
-  const transporter = nodemailer.createTransport(env.ARENA_MAIL_SMTP);
+  const transporter = nodemailer.createTransport(process.env.ARENA_MAIL_SMTP);
 
   return await transporter.sendMail({
-    from: env.ARENA_MAIL_SENDER,
+    from: process.env.ARENA_MAIL_SENDER,
     to,
     subject: mail.subject,
     html: mustache.render(mail.html, data),

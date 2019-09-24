@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const uuid = require('uuid');
 const validateBody = require('../../middlewares/validateBody');
 const mail = require('../../mail');
-const env = require('../../../env');
+
 const errorHandler = require('../../utils/errorHandler');
 const log = require('../../utils/log')(module);
 
@@ -53,7 +53,7 @@ module.exports = (app) => {
       });
       await mail('user.reset', user.email, {
         mail: user.email,
-        link: `${env.ARENA_WEBSITE}/reset/${user.resetToken}`,
+        link: `${process.env.ARENA_WEBSITE}/reset/${user.resetToken}`,
       });
 
       log.info(`user ${user.name} asked for mail reset`);
@@ -97,7 +97,7 @@ module.exports = (app) => {
 
       user.password = await bcrypt.hash(
         req.body.password,
-        parseInt(env.ARENA_API_BCRYPT_LEVEL, 10),
+        parseInt(process.env.ARENA_API_BCRYPT_LEVEL, 10),
       );
 
       user.resetToken = null;

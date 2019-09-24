@@ -1,10 +1,10 @@
-const env = require('../../../env');
+
 const errorHandler = require('../../utils/errorHandler');
 const isAuth = require('../../middlewares/isAuth');
 const log = require('../../utils/log')(module);
 const axios = require('axios');
 
-const slack = axios.create({ baseURL: env.SLACK_URL });
+const slack = axios.create({ baseURL: process.env.SLACK_URL });
 
 const _ = require('lodash');
 
@@ -78,28 +78,28 @@ module.exports = (app) => {
         let channel = '';
         switch (req.body.spotlight) {
           case 1:
-            channel = env.SLACK_CHANNEL_UA_TOURNOI_LOL;
+            channel = process.env.SLACK_CHANNEL_UA_TOURNOI_LOL;
             break;
           case 2:
-            channel = env.SLACK_CHANNEL_UA_TOURNOI_LOL;
+            channel = process.env.SLACK_CHANNEL_UA_TOURNOI_LOL;
             break;
           case 3:
-            channel = env.SLACK_CHANNEL_UA_TOURNOI_FORTNITE;
+            channel = process.env.SLACK_CHANNEL_UA_TOURNOI_FORTNITE;
             break;
           case 4:
-            channel = env.SLACK_CHANNEL_UA_TOURNOI_CS;
+            channel = process.env.SLACK_CHANNEL_UA_TOURNOI_CS;
             break;
           case 5:
-            channel = env.SLACK_CHANNEL_UA_TOURNOI_HS;
+            channel = process.env.SLACK_CHANNEL_UA_TOURNOI_HS;
             break;
           case 6:
-            channel = env.SLACK_CHANNEL_UA_TOURNOI_SSBU;
+            channel = process.env.SLACK_CHANNEL_UA_TOURNOI_SSBU;
             break;
           case 'libre':
-            channel = env.SLACK_CHANNEL_UA_TOURNOI_LIBRE;
+            channel = process.env.SLACK_CHANNEL_UA_TOURNOI_LIBRE;
             break;
           default:
-            channel = env.SLACK_CHANNEL_UA_APP;
+            channel = process.env.SLACK_CHANNEL_UA_APP;
             break;
         }
 

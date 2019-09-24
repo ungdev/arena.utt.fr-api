@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const isAuth = require('../../middlewares/isAuth');
-const env = require('../../../env');
+
 const errorHandler = require('../../utils/errorHandler');
 const { outputFields } = require('../../utils/publicFields');
 const { isTournamentFull, remainingPlaces } = require('../../utils/isFull');
@@ -34,8 +34,8 @@ module.exports = (app) => {
       });
 
       // Generate new token
-      const token = jwt.sign({ id: req.user.id }, env.ARENA_API_SECRET, {
-        expiresIn: env.ARENA_API_SECRET_EXPIRES,
+      const token = jwt.sign({ id: req.user.id }, process.env.ARENA_API_SECRET, {
+        expiresIn: process.env.ARENA_API_SECRET_EXPIRES,
       });
 
       const user = req.user.toJSON();

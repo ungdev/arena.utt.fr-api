@@ -1,5 +1,5 @@
 const axios = require('axios');
-const env = require('../../../env');
+
 const errorHandler = require('../../utils/errorHandler');
 const isAuth = require('../../middlewares/isAuth');
 /**
@@ -28,7 +28,7 @@ module.exports = (app) => {
       const resp = await axios.get(`${toornamentID}/matches`, {
         baseURL: 'https://api.toornament.com/organizer/v2/tournaments',
         headers: {
-          'X-Api-Key': env.TOORNAMENT_KEY,
+          'X-Api-Key': process.env.TOORNAMENT_KEY,
           Authorization: `Bearer ${accessToken}`,
           Range: 'matches=0-99' },
       });
