@@ -46,7 +46,6 @@
     "reload": "pm2 reload arena.utt.fr-api --update-env",
     "lint": "eslint src/ --ext .js",
     "lint-fix": "eslint --fix src/ --ext .js",
-    "seed": "sequelize-cli db:seed:all",
-    "seed-undo": "sequelize-cli db:seed:undo:all"
+    "seed": "sequelize-cli db:drop; sequelize-cli db:create --charset=utf8; sequelize-cli db:seed:all"
   }
 }
