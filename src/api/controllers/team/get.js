@@ -22,10 +22,15 @@ module.exports = (app) => {
           ['name', 'ASC'],
         ],
       });
-      const users = team.users.map((user) => user.username);
+      if (team) {
+        const users = team.users.map((user) => user.username);
+        return res
+          .status(200)
+          .json({ ...team.toJSON(), users })
+          .end();
+      }
       return res
-        .status(200)
-        .json({ ...team.toJSON(), users })
+        .status(404)
         .end();
     }
     catch (err) {

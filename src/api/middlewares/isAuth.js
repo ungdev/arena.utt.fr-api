@@ -22,20 +22,11 @@ module.exports = (route) => async (req, res, next) => {
   try {
     const decoded = await jwt.verify(auth, process.env.ARENA_API_SECRET);
 
-    const user = await User.findByPk(decoded.id, {
-      include:
-      [
-        // todo: decommenter ça
-        /* {
-          model: Team,
-          include: [User, Spotlight]
-        } */
-      ],
-    });
+    const user = await User.findByPk(decoded.id);
 
     req.user = user;
 
-    next();
+    return next();
   }
   catch (err) {
     log.warn('invalid token', { route });
