@@ -3,5 +3,4 @@ module.exports = (sequelize, DataTypes) => sequelize.define('item', {
   key: { type: DataTypes.STRING, allowNull: false },
   price: { type: DataTypes.INTEGER.UNSIGNED, allowNull: false },
   infos: { type: DataTypes.STRING },
-  attributes: { type: DataTypes.JSON },
 });
