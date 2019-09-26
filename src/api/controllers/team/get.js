@@ -11,12 +11,14 @@ module.exports = (app) => {
   app.get('/teams/:id', [isAuth()]);
 
   app.get('/teams/:id', async (req, res) => {
-    const { Team, User } = req.app.locals.models;
+    const { Team, User, Tournament } = req.app.locals.models;
 
     try {
       const team = await Team.findByPk(req.params.id, {
         include: [{
           model: User,
+        }, {
+          model: Tournament,
         }],
         order: [
           ['name', 'ASC'],

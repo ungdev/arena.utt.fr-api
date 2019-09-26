@@ -1,9 +1,7 @@
 const { check } = require('express-validator/check');
-const moment = require('moment');
 const validateBody = require('../../middlewares/validateBody');
 const isAuth = require('../../middlewares/isAuth');
 const isNotInTeam = require('../../middlewares/isNotInTeam');
-const { isTournamentFull } = require('../../utils/isFull');
 const errorHandler = require('../../utils/errorHandler');
 const log = require('../../utils/log')(module);
 

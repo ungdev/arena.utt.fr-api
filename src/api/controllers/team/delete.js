@@ -6,7 +6,6 @@ const isCaptain = require('../../middlewares/isCaptain');
  * DELETE /teams/:id
  *
  * Response:
- *  "Team deleted"
  */
 module.exports = (app) => {
   app.delete('/teams/:id', [isAuth(), isCaptain()]);
