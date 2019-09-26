@@ -1,4 +1,4 @@
-module.exports = function (sequelize) {
+module.exports = (sequelize) => {
   const Attribute = sequelize.import(`${__dirname}/attribute`);
   const Cart = sequelize.import(`${__dirname}/cart`);
   const CartItem = sequelize.import(`${__dirname}/cartItem`);
