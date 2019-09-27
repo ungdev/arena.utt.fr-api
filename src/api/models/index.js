@@ -17,8 +17,10 @@ module.exports = (sequelize) => {
   Item.hasOne(CartItem);
 
   Team.hasMany(User);
+  User.belongsTo(Team);
 
   Tournament.hasMany(Team);
+  Team.belongsTo(Tournament);
   Tournament.hasMany(State);
   Tournament.hasMany(Info);
 
@@ -27,8 +29,8 @@ module.exports = (sequelize) => {
   User.hasMany(Cart);
 
   Attribute.hasMany(CartItem);
-  Attribute.belongsToMany(Item, { through: 'ItemsHasAttributes' });
-  Item.belongsToMany(Attribute, { through: 'ItemsHasAttributes' });
+  Attribute.belongsToMany(Item, { through: 'itemshasattributes' });
+  Item.belongsToMany(Attribute, { through: 'itemshasattributes' });
 
 
   // Associations

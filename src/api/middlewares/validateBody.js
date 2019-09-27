@@ -1,4 +1,4 @@
-const { validationResult } = require('express-validator/check');
+const { validationResult } = require('express-validator');
 const { matchedData } = require('express-validator/filter');
 const log = require('../utils/log')(module);
 

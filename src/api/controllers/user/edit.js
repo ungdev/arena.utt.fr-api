@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-const { check } = require('express-validator/check');
+const { check } = require('express-validator');
 const validateBody = require('../../middlewares/validateBody');
 const isAuth = require('../../middlewares/isAuth');
 
@@ -20,25 +20,20 @@ const log = require('../../utils/log')(module);
  *    user: User
  * }
  */
+// todo: enlever des charactères speciaux ?
 module.exports = (app) => {
-  app.put('/user', [isAuth('user-edit')]);
+  app.put('/users/:id', [isAuth()]);
 
-  app.put('/user', [
-    check('name')
-      .exists()
-      .matches(/[0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzªµºÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿĄąĆćĘęıŁłŃńŒœŚśŠšŸŹźŻżŽžƒˆˇˉμﬁﬂ -]+/i)
+  app.put('/users/:id', [
+    check('username')
+      .matches(/^[A-zÀ-ÿ0-9 '#@!&\-$%]{3,}$/i)
       .isLength({ min: 3, max: 90 }),
     check('lastname')
-      .exists()
-      .matches(/[0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzªµºÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿĄąĆćĘęıŁłŃńŒœŚśŠšŸŹźŻżŽžƒˆˇˉμﬁﬂ -]+/i)
+      .matches(/^[A-zÀ-ÿ0-9 '#@!&\-$%]{3,}$/i)
       .isLength({ min: 2, max: 200 }),
     check('firstname')
-      .exists()
-      .matches(/[0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzªµºÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿĄąĆćĘęıŁłŃńŒœŚśŠšŸŹźŻżŽžƒˆˇˉμﬁﬂ -]+/i)
+      .matches(/^[A-zÀ-ÿ0-9 '#@!&\-$%]{3,}$/i)
       .isLength({ min: 2, max: 200 }),
-    check('gender')
-      .isIn(['M', 'F', 'N/A'])
-      .exists(),
     check('password')
       .optional()
       .isLength({ min: 6 }),
@@ -48,7 +43,7 @@ module.exports = (app) => {
     validateBody(),
   ]);
 
-  app.put('/user', async (req, res) => {
+  app.put('/users/:id', async (req, res) => {
     try {
       if (req.body.password) {
         req.body.password = await bcrypt.hash(
