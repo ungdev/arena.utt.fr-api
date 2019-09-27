@@ -8,8 +8,8 @@ module.exports = {
       itemshasattributes.push({ attributeId, itemId: 1 }, { attributeId, itemId: 2 });
     }
 
-    itemshasattributes = itemshasattributes.map((tournament) => ({
-      ...tournament,
+    itemshasattributes = itemshasattributes.map((itemattribute) => ({
+      ...itemattribute,
       createdAt: new Date(),
       updatedAt: new Date(),
     }));
