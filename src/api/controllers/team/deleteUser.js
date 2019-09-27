@@ -54,16 +54,16 @@ module.exports = (app) => {
           .json({ error: 'CAPTAIN' })
           .end();
       }
-      if (user.team.captainId !== req.user.id) {
+      if (user.team.captainId === req.user.id || req.params.userId === req.user.id) {
+        user.teamId = null;
+        await user.save();
         return res
-          .status(401)
+          .status(200)
           .json({})
           .end();
       }
-      user.teamId = null;
-      await user.save();
       return res
-        .status(200)
+        .status(401)
         .json({})
         .end();
     }
