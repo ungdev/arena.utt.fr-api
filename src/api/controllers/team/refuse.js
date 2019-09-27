@@ -23,7 +23,7 @@ module.exports = (app) => {
   ]);
 
   app.delete('/teams/:id/request', async (req, res) => {
-    const { Team, User } = req.app.locals.models;
+    const { User } = req.app.locals.models;
 
     try {
       if (req.user.askingTeamId === req.params.id && req.body.user === req.user.id) {
@@ -37,17 +37,17 @@ module.exports = (app) => {
           .json({})
           .end();
       }
-      const team = await Team.findByPk(req.user.teamId);
 
-      if (req.user.id !== team.captainId) {
+      if (req.user.id !== req.user.team.captainId) {
         return res
           .status(400)
-          .json({ error: 'NOT_CAPTAIN' });
+          .json({ error: 'NO_CAPTAIN' });
       }
 
-      const user = await User.findByPk(req.body.user, {
+      const user = await User.findOne({
         where: {
           askingTeamId: req.params.id,
+          id: req.body.user,
         },
       });
       user.askingTeamId = null;
