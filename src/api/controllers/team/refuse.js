@@ -1,49 +1,57 @@
 const { check } = require('express-validator/check');
 const validateBody = require('../../middlewares/validateBody');
 const isAuth = require('../../middlewares/isAuth');
-const isInTeam = require('../../middlewares/isInTeam');
-const isCaptain = require('../../middlewares/isCaptain');
 const errorHandler = require('../../utils/errorHandler');
 const log = require('../../utils/log')(module);
 
 /**
- * POST /team/:id/refuse
+ * DELETE /teams/:id/request
  * {
- *   user: String
+ *    user: UUID
  * }
  *
  * Response:
- * {
- *
- * }
+ * {}
  */
 module.exports = (app) => {
-  app.post('/team/:id/refuse', [
-    isAuth('team-refuse'),
-    isInTeam('team-refuse'),
-    isCaptain('team-refuse'),
-  ]);
+  app.delete('/teams/:id/request', [isAuth()]);
 
-  app.post('/team/:id/refuse', [
+  app.delete('/teams/:id/request', [
     check('user')
-      .exists()
-      .isUUID(),
+      .exists(),
     validateBody(),
   ]);
 
-  app.post('/team/:id/refuse', async (req, res) => {
-    try {
-      const user = await req.app.locals.models.User.findByPk(req.body.user);
+  app.delete('/teams/:id/request', async (req, res) => {
+    const { Team, User } = req.app.locals.models;
 
-      await req.app.locals.models.AskingUser.destroy({
+    try {
+      if (req.user.askingTeamId === req.params.id && req.body.user === req.user.id) {
+        req.user.askingTeamId = null;
+        await req.user.save();
+
+        log.info(`user ${req.user.username} cancel request to team ${req.params.id}`);
+
+        return res
+          .status(200)
+          .json({})
+          .end();
+      }
+      const team = await Team.findByPk(req.user.teamId);
+
+      if (req.user.id !== team.captainId) {
+        return res
+          .status(400)
+          .json({ error: 'NOT_CAPTAIN' });
+      }
+
+      const user = await User.findByPk(req.body.user, {
         where: {
-          userId: user.id,
-          teamId: req.params.id,
+          askingTeamId: req.params.id,
         },
       });
-
-      log.info(`user ${req.user.name} refused user ${user.name}`);
-
+      user.askingTeamId = null;
+      await user.save();
       return res
         .status(200)
         .json({})
