@@ -2,7 +2,7 @@ const Sequelize = require('sequelize');
 
 const ticketId = 1;
 
-module.exports = async function isTeamPaid(req, team, tournaments) {
+module.exports = async function isTeamPaid(req, team, tournaments, playersPerTeam) {
   const { Cart, CartItem } = req.app.locals.models;
   const cartItemTickets = await CartItem.findAll({
     where: {
@@ -22,7 +22,7 @@ module.exports = async function isTeamPaid(req, team, tournaments) {
       },
     },
   });
-  const sizeTeam = tournaments[team.tournamentId - 1].playersPerTeam;
+  const sizeTeam = playersPerTeam || tournaments[team.tournamentId - 1].playersPerTeam;
   if (cartItemTickets.length === sizeTeam && cartsUnpayed.length === 0) {
     return true;
   }

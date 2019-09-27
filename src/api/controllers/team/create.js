@@ -3,6 +3,7 @@ const validateBody = require('../../middlewares/validateBody');
 const isAuth = require('../../middlewares/isAuth');
 const isNotInTeam = require('../../middlewares/isNotInTeam');
 const errorHandler = require('../../utils/errorHandler');
+const { isTournamentFull } = require('../../utils/isFull');
 const log = require('../../utils/log')(module);
 
 /**
@@ -41,13 +42,13 @@ module.exports = (app) => {
           },
         ],
       });
-
-      // if (isTournamentFull(tournament)) {
-      //   return res
-      //     .status(400)
-      //     .json({ error: 'SPOTLIGHT_FULL' })
-      //     .end();
-      // }
+      const tournamentFull = await isTournamentFull(tournament, req);
+      if (tournamentFull) {
+        return res
+          .status(400)
+          .json({ error: 'TOURNAMENT_FULL' })
+          .end();
+      }
 
       const team = await Team.create({
         name: req.body.name,
