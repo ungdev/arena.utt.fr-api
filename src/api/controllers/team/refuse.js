@@ -34,7 +34,6 @@ module.exports = (app) => {
 
         return res
           .status(200)
-          .json({})
           .end();
       }
 
@@ -54,7 +53,6 @@ module.exports = (app) => {
       await user.save();
       return res
         .status(200)
-        .json({})
         .end();
     }
     catch (err) {

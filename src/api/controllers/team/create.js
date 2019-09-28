@@ -23,7 +23,8 @@ module.exports = (app) => {
   app.post('/teams', [
     check('name')
       .exists()
-      .matches(/^[A-zÀ-ÿ0-9 '#@!&\-$%]{3,}$/i),
+      .matches(/^[A-zÀ-ÿ0-9 '#@!&\-$%]{3,}$/i)
+      .isLength({ max: 40 }),
     check('tournament')
       .exists()
       .matches(/\d/),

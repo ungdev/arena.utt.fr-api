@@ -59,7 +59,6 @@ module.exports = (app) => {
 
         return res
           .status(200)
-          .send('OK')
           .end();
       }
       return res.status(404).json({ error: 'NOT_ASKING_USER' }).end();
