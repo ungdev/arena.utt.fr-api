@@ -1,4 +1,4 @@
-const { check } = require('express-validator/check');
+const { check } = require('express-validator');
 const validateBody = require('../../middlewares/validateBody');
 const isAuth = require('../../middlewares/isAuth');
 const isCaptain = require('../../middlewares/isCaptain');
@@ -35,6 +35,7 @@ module.exports = (app) => {
       const team = await Team.findByPk(req.params.id, {
         include: [{
           model: User,
+          attributes: ['id'],
         }, {
           model: Tournament,
           attributes: ['playersPerTeam'],
@@ -58,7 +59,7 @@ module.exports = (app) => {
 
         return res
           .status(200)
-          .json({})
+          .send('OK')
           .end();
       }
       return res.status(404).json({ error: 'NOT_ASKING_USER' }).end();

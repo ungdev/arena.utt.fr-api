@@ -24,7 +24,7 @@ module.exports = (app) => {
       log.warn(`user ${req.user.name} tried to kick without being captain`);
 
       return res
-        .status(401)
+        .status(403)
         .json({ error: 'NO_CAPTAIN' })
         .end();
     }
@@ -50,7 +50,7 @@ module.exports = (app) => {
       if (user.team.captainId === req.params.userId) {
         log.info('Impossible to delete captain user');
         return res
-          .status(401)
+          .status(403)
           .json({ error: 'CAPTAIN' })
           .end();
       }
