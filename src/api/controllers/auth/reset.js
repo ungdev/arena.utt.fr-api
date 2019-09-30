@@ -25,14 +25,13 @@ const log = require('../../utils/log')(module);
  * }
  */
 module.exports = (app) => {
-  app.post('/user/reset', [
+  app.post('/auth/reset', [
     check('email')
-      .exists()
       .isEmail(),
     validateBody(),
   ]);
 
-  app.post('/user/reset', async (req, res) => {
+  app.post('/auth/reset', async (req, res) => {
     const { User } = req.app.locals.models;
     const { email } = req.body;
 
@@ -68,21 +67,19 @@ module.exports = (app) => {
     }
   });
 
-  app.put('/user/reset', [
+  app.put('/auth/reset', [
     check('password')
-      .exists()
       .isLength({ min: 6 }),
-    check('token')
-      .exists()
+    check('resetToken')
       .isUUID(),
     validateBody(),
   ]);
 
-  app.put('/user/reset', async (req, res) => {
+  app.put('/auth/reset', async (req, res) => {
     const { User } = req.app.locals.models;
 
     try {
-      const resetToken = req.body.token;
+      const {resetToken } = req.body;
 
       const user = await User.findOne({ where: { resetToken } });
 
@@ -107,8 +104,7 @@ module.exports = (app) => {
       log.info(`user ${user.name} reseted his password`);
 
       return res
-        .status(200)
-        .json({})
+        .status(204)
         .end();
     }
     catch (err) {

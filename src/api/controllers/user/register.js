@@ -9,8 +9,23 @@ const random = require('../../utils/random');
 const errorHandler = require('../../utils/errorHandler');
 const log = require('../../utils/log')(module);
 
+/**
+ * POST /users
+ * {
+ *   username: String
+ *   lastname: String
+ *   firstname: String
+ *   password: String
+ *   email: String
+ * }
+ *
+ * Response
+ * {
+ *
+ * }
+ */
 module.exports = (app) => {
-  app.post('/user', [
+  app.post('/users', [
     check('username')
       .matches(/^[A-zÀ-ÿ0-9 '#@!&\-$%]*$/i)
       .isLength({ min: 3, max: 100 }),
@@ -28,7 +43,7 @@ module.exports = (app) => {
     validateBody(),
   ]);
 
-  app.post('/user', async (req, res) => {
+  app.post('/users', async (req, res) => {
     const { User } = req.app.locals.models;
 
     try {
