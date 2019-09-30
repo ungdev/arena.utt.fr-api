@@ -24,7 +24,6 @@ module.exports = (app) => {
       .optional()
       .isLength({ min: 6 }),
     check('email')
-      .exists()
       .isEmail(),
     validateBody(),
   ]);
