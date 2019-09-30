@@ -10,37 +10,21 @@ const random = require('../../utils/random');
 const errorHandler = require('../../utils/errorHandler');
 const log = require('../../utils/log')(module);
 
-/**
- * POST /user
- * {
- *    username: String
- *    password: String
- *    email: String
- * }
- *
- * Response:
- * {
- *
- * }
- */
 module.exports = (app) => {
   app.post('/user', [isLoginEnabled()]);
 
   app.post('/user', [
     check('username')
-      .exists()
-      .matches(/[0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzªµºÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿĄąĆćĘęıŁłŃńŒœŚśŠšŸŹźŻżŽžƒˆˇˉμﬁﬂ -]+/i)
-      .isLength({ min: 3, max: 90 }),
+      .matches(/^[A-zÀ-ÿ0-9 '#@!&\-$%]*$/i)
+      .isLength({ min: 3, max: 100 }),
     check('lastname')
-      .exists()
-      .matches(/[0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzªµºÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿĄąĆćĘęıŁłŃńŒœŚśŠšŸŹźŻżŽžƒˆˇˉμﬁﬂ -]+/i)
-      .isLength({ min: 2, max: 200 }),
+      .matches(/^[A-zÀ-ÿ0-9 '#@!&\-$%]*$/i)
+      .isLength({ min: 2, max: 100 }),
     check('firstname')
-      .exists()
-      .matches(/[0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzªµºÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿĄąĆćĘęıŁłŃńŒœŚśŠšŸŹźŻżŽžƒˆˇˉμﬁﬂ -]+/i)
-      .isLength({ min: 2, max: 200 }),
+      .matches(/^[A-zÀ-ÿ0-9 '#@!&\-$%]*$/i)
+      .isLength({ min: 2, max: 100 }),
     check('password')
-      .exists()
+      .optional()
       .isLength({ min: 6 }),
     check('email')
       .exists()
@@ -65,9 +49,8 @@ module.exports = (app) => {
 
       log.info(`user ${req.body.name} created`);
 
-      res
-        .status(200)
-        .json({})
+      return res
+        .status(204)
         .end();
     }
     catch (err) {

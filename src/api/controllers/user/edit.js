@@ -4,36 +4,21 @@ const validateBody = require('../../middlewares/validateBody');
 const isAuth = require('../../middlewares/isAuth');
 
 const errorHandler = require('../../utils/errorHandler');
-const { outputFields, inputFields } = require('../../utils/publicFields');
 const log = require('../../utils/log')(module);
 
-/**
- * PUT /user
- * {
- *    name: String
- *    email: String
- *    [password]: String
- * }
- *
- * Response:
- * {
- *    user: User
- * }
- */
-// todo: enlever des charactères speciaux ?
 module.exports = (app) => {
   app.put('/users/:id', [isAuth()]);
 
   app.put('/users/:id', [
     check('username')
-      .matches(/^[A-zÀ-ÿ0-9 '#@!&\-$%]{3,}$/i)
-      .isLength({ min: 3, max: 90 }),
+      .matches(/^[A-zÀ-ÿ0-9 '#@!&\-$%]*$/i)
+      .isLength({ min: 3, max: 100 }),
     check('lastname')
-      .matches(/^[A-zÀ-ÿ0-9 '#@!&\-$%]{3,}$/i)
-      .isLength({ min: 2, max: 200 }),
+      .matches(/^[A-zÀ-ÿ0-9 '#@!&\-$%]*$/i)
+      .isLength({ min: 2, max: 100 }),
     check('firstname')
-      .matches(/^[A-zÀ-ÿ0-9 '#@!&\-$%]{3,}$/i)
-      .isLength({ min: 2, max: 200 }),
+      .matches(/^[A-zÀ-ÿ0-9 '#@!&\-$%]*$/i)
+      .isLength({ min: 2, max: 100 }),
     check('password')
       .optional()
       .isLength({ min: 6 }),
@@ -45,6 +30,9 @@ module.exports = (app) => {
 
   app.put('/users/:id', async (req, res) => {
     try {
+      // todo: refaire pour admins
+      if (req.params.id !== req.user.id) return res.status(403).json({ error: 'UNAUTHORIZED' }).end();
+
       if (req.body.password) {
         req.body.password = await bcrypt.hash(
           req.body.password,
@@ -52,15 +40,21 @@ module.exports = (app) => {
         );
       }
 
-      const body = inputFields(req.body);
+      const { firstname, lastname, username, password } = req.body;
+      const body = {
+        id: req.params.id,
+        username,
+        firstname,
+        lastname,
+        password,
+      };
 
       await req.user.update(body);
 
       log.info(`user ${req.body.name} updated`);
 
       return res
-        .status(200)
-        .json({ user: outputFields(req.user) })
+        .status(204)
         .end();
     }
     catch (err) {
