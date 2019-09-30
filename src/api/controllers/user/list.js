@@ -1,6 +1,17 @@
 const isAuth = require('../../middlewares/isAuth');
 const errorHandler = require('../../utils/errorHandler');
 
+/**
+ * GET /users
+ * {
+ *
+ * }
+ *
+ * Response
+ * {
+ *   [User]
+ * }
+ */
 module.exports = (app) => {
   app.get('/users', [isAuth()]);
 

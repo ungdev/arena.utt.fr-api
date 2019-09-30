@@ -1,6 +1,16 @@
 const isAuth = require('../../middlewares/isAuth');
 const errorHandler = require('../../utils/errorHandler');
-
+/**
+ * GET /users/:id
+ * {
+ *
+ * }
+ *
+ * Response
+ * {
+ *   User
+ * }
+ */
 // todo: admin chekc
 module.exports = (app) => {
   app.get('/users/:id', isAuth());
@@ -18,7 +28,11 @@ module.exports = (app) => {
       });
 
       if (!user) return res.status(404).json({ error: 'NOT_FOUND' }).end();
-      if (req.params.id !== user.id) return res.status(403).json({ error: 'UNAUTHORIZED' }).end();
+      if (req.params.id !== user.id) {
+        return res.status(403)
+          .json({ error: 'UNAUTHORIZED' })
+          .end();
+      }
 
       return res
         .status(200)
