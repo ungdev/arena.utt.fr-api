@@ -9,7 +9,7 @@ module.exports = (app) => {
 
     try {
       const users = await User.findAll({
-        attributes: ['username', 'firstname', 'lastname', 'teamId'],
+        attributes: ['username', 'firstname', 'lastname'],
         include: {
           model: Team,
           attributes: ['name'],
