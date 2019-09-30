@@ -2,36 +2,24 @@ const { check } = require('express-validator');
 const jwt = require('jsonwebtoken');
 
 const validateBody = require('../../middlewares/validateBody');
-const { outputFields } = require('../../utils/publicFields');
 const errorHandler = require('../../utils/errorHandler');
 const log = require('../../utils/log')(module);
 
-/**
- * POST /user/validate
- * {
- *    email: String
- * }
- *
- * Response:
- * {
- *    token: String
- * }
- *
- */
 module.exports = (app) => {
-  app.post('/user/validate', [
-    check('slug')
-      .exists()
+  app.post('/auth/validation', [
+    check('registerToken')
+      .isUUID(),
+    check('id')
       .isUUID(),
     validateBody(),
   ]);
 
-  app.post('/user/validate', async (req, res) => {
+  app.post('/auth/validation', async (req, res) => {
     const { User } = req.app.locals.models;
-    const registerToken = req.body.slug;
+    const { registerToken, id } = req.body;
 
     try {
-      const user = await User.findOne({ where: { registerToken } });
+      const user = await User.findOne({ where: { id, registerToken } });
 
       if (!user) {
         log.warn(`can not validate ${registerToken}, user not found`);
@@ -56,7 +44,7 @@ module.exports = (app) => {
 
       return res
         .status(200)
-        .json({ user: outputFields(user), token })
+        .json({ id: user.id, token })
         .end();
     }
     catch (err) {

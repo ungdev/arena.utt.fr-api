@@ -3,7 +3,6 @@ const bcrypt = require('bcryptjs');
 const uuid = require('uuid');
 const hash = require('util').promisify(bcrypt.hash);
 const validateBody = require('../../middlewares/validateBody');
-const isLoginEnabled = require('../../middlewares/isLoginEnabled');
 const mail = require('../../mail');
 
 const random = require('../../utils/random');
@@ -11,8 +10,6 @@ const errorHandler = require('../../utils/errorHandler');
 const log = require('../../utils/log')(module);
 
 module.exports = (app) => {
-  app.post('/user', [isLoginEnabled()]);
-
   app.post('/user', [
     check('username')
       .matches(/^[A-zÀ-ÿ0-9 '#@!&\-$%]*$/i)

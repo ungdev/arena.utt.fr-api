@@ -6,9 +6,7 @@ const { Op } = require('sequelize');
 
 const log = require('../../utils/log')(module);
 const errorHandler = require('../../utils/errorHandler');
-const { outputFields } = require('../../utils/publicFields');
 const validateBody = require('../../middlewares/validateBody');
-const isLoginEnabled = require('../../middlewares/isLoginEnabled');
 
 /**
  * PUT /user/login
@@ -24,9 +22,7 @@ const isLoginEnabled = require('../../middlewares/isLoginEnabled');
  * }
  */
 module.exports = (app) => {
-  app.put('/user/login', [isLoginEnabled()]);
-
-  app.put('/user/login', [
+  app.post('/auth/login', [
     check('username')
       .exists()
       .matches(/[0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzªµºÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿĄąĆćĘęıŁłŃńŒœŚśŠšŸŹźŻżŽžƒˆˇˉμﬁﬂ \-]+/i),
@@ -35,7 +31,7 @@ module.exports = (app) => {
     validateBody(),
   ]);
 
-  app.put('/user/login', async (req, res) => {
+  app.post('/auth/login', async (req, res) => {
     const { User } = req.app.locals.models;
 
     try {
@@ -84,11 +80,11 @@ module.exports = (app) => {
         expiresIn: process.env.ARENA_API_SECRET_EXPIRES,
       });
 
-      log.info(`user ${user.name} logged`);
+      log.info(`user ${user.username} logged`);
 
       return res
         .status(200)
-        .json({ user: outputFields(user), token })
+        .json({ id: user.id, token })
         .end();
     }
     catch (err) {
