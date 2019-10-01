@@ -20,3 +20,5 @@ yarn-error.log*
 
 # IDE Configs
 /.idea
+
+/uploads
