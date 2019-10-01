@@ -4,11 +4,12 @@ const uuidv4 = require('uuid/v4')
 
 const handleFileSaving = async (file) => {
   return new Promise((resolve, reject) => {
-    file.mv('./uploads/' + uuidv4(), (err) => {
+    const fileId = uuidv4();
+    file.mv('./uploads/' + fileId, (err) => {
       if (err) {
         reject(err);
       }
-      resolve();
+      resolve(fileId);
     });
   });
 };
@@ -16,12 +17,12 @@ const handleFileSaving = async (file) => {
 
 const uploadFile = async (request, response) => {
   try {
-    await handleFileSaving(request.files.file)
+    const fileId = await handleFileSaving(request.files.file)
+    return response.json({fileId: fileId}).status(200).end();
   } catch (err) {
     console.log(err.message)
     return response.json({message: 'something went wrong'}).status(500);
   }
-  return response.status(200).end();
 };
 
 module.exports = (app) => {
