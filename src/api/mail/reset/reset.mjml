@@ -4,11 +4,11 @@
     <mj-include path="../partials/header.mjml"/>
     <mj-section background-color="#ffffff">
       <mj-column>
-        <mj-text color="#e20007" align="center" font-family="Montserrat" font-size="35px" padding-top="0px">INSCRIPTION</mj-text>
+        <mj-text color="#e20007" align="center" font-family="Montserrat" font-size="35px" padding-top="0px">MOT DE PASSE OUBLIÉ</mj-text>
         <mj-divider border-width="1px" border-color="#e20007" padding-top="5px"/>
-        <mj-text font-size="18px" font-weight="bold">Bienvenue sur l'UTT Arena, {{ username }} !</mj-text>
-        <mj-text>Merci de vérifier votre e-mail en cliquant sur le bouton ci-dessous</mj-text>
-        <mj-button href="{{ link }}">CONFIRMER l'INSCRIPTION</mj-button>
+        <mj-text font-size="18px" font-weight="bold">Bonjour {{ username }} !</mj-text>
+        <mj-text>Vous avez demandé à changer votre mot de passe, cliquez ci-dessous pour continuer</mj-text>
+        <mj-button href="{{ link }}">CHANGER MON MOT DE PASSE</mj-button>
         <mj-text>À bientôt pour l'UTT Arena !</mj-text>
         <mj-text align="right">
           <i>- Toute l'équipe organisatrice</i>

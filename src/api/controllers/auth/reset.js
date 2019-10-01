@@ -5,6 +5,7 @@ const validateBody = require('../../middlewares/validateBody');
 
 const errorHandler = require('../../utils/errorHandler');
 const log = require('../../utils/log')(module);
+const sendMail = require('../../mail/reset');
 
 /**
  * POST /auth/reset
@@ -49,10 +50,11 @@ module.exports = (app) => {
       await user.update({
         resetToken: uuid(),
       });
-      /* await mail('user.reset', user.email, {
-        mail: user.email,
+
+      await sendMail(user.email, {
+        username: user.username,
         link: `${process.env.ARENA_WEBSITE}/reset/${user.resetToken}`,
-      }); */
+      });
 
       log.info(`user ${user.username} asked for mail reset`);
 
