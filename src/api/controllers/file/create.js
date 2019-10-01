@@ -1,6 +1,7 @@
 const fileUploader = require('express-fileupload')
 const fs = require('fs')
 const uuidv4 = require('uuid/v4')
+const log = require('../../utils/log')(module)
 
 const handleFileSaving = async (file) => {
   return new Promise((resolve, reject) => {
@@ -20,7 +21,7 @@ const uploadFile = async (request, response) => {
     const fileId = await handleFileSaving(request.files.file)
     return response.json({fileId: fileId}).status(200).end();
   } catch (err) {
-    console.log(err.message)
+    log.error(err.message);
     return response.json({message: 'something went wrong'}).status(500);
   }
 };
