@@ -8,7 +8,7 @@ const errorHandler = require('../../utils/errorHandler');
 const log = require('../../utils/log')(module);
 
 /**
- * POST /user/reset
+ * POST /auth/reset
  * {
  *    email: String
  * }
@@ -18,7 +18,7 @@ const log = require('../../utils/log')(module);
  *
  * }
  *
- * PUT /user/reset
+ * PUT /auth/reset
  * {
  *    token: String,
  *    password: String
@@ -55,11 +55,10 @@ module.exports = (app) => {
         link: `${process.env.ARENA_WEBSITE}/reset/${user.resetToken}`,
       });
 
-      log.info(`user ${user.name} asked for mail reset`);
+      log.info(`user ${user.username} asked for mail reset`);
 
       return res
-        .status(200)
-        .json({})
+        .status(204)
         .end();
     }
     catch (err) {
@@ -79,7 +78,7 @@ module.exports = (app) => {
     const { User } = req.app.locals.models;
 
     try {
-      const {resetToken } = req.body;
+      const { resetToken } = req.body;
 
       const user = await User.findOne({ where: { resetToken } });
 
@@ -101,7 +100,7 @@ module.exports = (app) => {
 
       await user.save();
 
-      log.info(`user ${user.name} reseted his password`);
+      log.info(`user ${user.username} reseted his password`);
 
       return res
         .status(204)

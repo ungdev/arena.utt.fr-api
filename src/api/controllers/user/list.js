@@ -1,10 +1,12 @@
+const { Op } = require('sequelize');
+
 const isAuth = require('../../middlewares/isAuth');
 const errorHandler = require('../../utils/errorHandler');
 
 /**
  * GET /users
- * {
- *
+ * Query Params: {
+ *    username: String. Fait une requete LIKE en SQL
  * }
  *
  * Response
@@ -21,6 +23,11 @@ module.exports = (app) => {
     try {
       const users = await User.findAll({
         attributes: ['username', 'firstname', 'lastname'],
+        where: {
+          username: {
+            [Op.like]: req.query.username ? `%${req.query.username}%` : '%%',
+          },
+        },
         include: {
           model: Team,
           attributes: ['name'],

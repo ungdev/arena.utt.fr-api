@@ -32,7 +32,7 @@ module.exports = (app) => {
   ]);
 
   app.post('/auth/login', async (req, res) => {
-    const { User } = req.app.locals.models;
+    const { User, Team } = req.app.locals.models;
 
     try {
       const { username, password } = req.body;
@@ -41,6 +41,10 @@ module.exports = (app) => {
       const user = await User.findOne({
         where: {
           [Op.or]: [{ username }, { email: username }],
+        },
+        include: {
+          model: Team,
+          attributes: ['id', 'name'],
         },
       });
 
@@ -84,7 +88,19 @@ module.exports = (app) => {
 
       return res
         .status(200)
-        .json({ id: user.id, token })
+        .json(
+          {
+            user: {
+              id: user.id,
+              username: user.username,
+              firstname: user.firstname,
+              lastname: user.lastname,
+              email: user.email,
+              team: user.team,
+            },
+            token,
+          },
+        )
         .end();
     }
     catch (err) {

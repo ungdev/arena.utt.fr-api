@@ -5,6 +5,18 @@ const validateBody = require('../../middlewares/validateBody');
 const errorHandler = require('../../utils/errorHandler');
 const log = require('../../utils/log')(module);
 
+/**
+ * POST /auth/validation
+ * {
+ *   registerToken: UUID
+ *   id: UUID
+ * }
+ * Response
+ * {
+ *    User,
+ *    Token: String
+ * }
+ */
 module.exports = (app) => {
   app.post('/auth/validation', [
     check('registerToken')
@@ -15,11 +27,17 @@ module.exports = (app) => {
   ]);
 
   app.post('/auth/validation', async (req, res) => {
-    const { User } = req.app.locals.models;
+    const { User, Team } = req.app.locals.models;
     const { registerToken, id } = req.body;
 
     try {
-      const user = await User.findOne({ where: { id, registerToken } });
+      const user = await User.findOne({
+        where: { id, registerToken },
+        include: {
+          model: Team,
+          attributes: ['id', 'name'],
+        },
+      });
 
       if (!user) {
         log.warn(`can not validate ${registerToken}, user not found`);
@@ -42,9 +60,22 @@ module.exports = (app) => {
 
       log.info(`user ${user.username} logged`);
 
+
       return res
         .status(200)
-        .json({ id: user.id, token })
+        .json(
+          {
+            user: {
+              id: user.id,
+              username: user.username,
+              firstname: user.firstname,
+              lastname: user.lastname,
+              email: user.email,
+              team: user.team,
+            },
+            token,
+          },
+        )
         .end();
     }
     catch (err) {
