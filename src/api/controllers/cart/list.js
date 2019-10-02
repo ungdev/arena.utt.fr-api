@@ -1,5 +1,15 @@
 const isAuth = require('../../middlewares/isAuth');
 
+/**
+ * GET /users/:userId/carts
+ * {
+ *
+ * }
+ * Response
+ * {
+ *   [Cart]
+ * }
+ */
 module.exports = (app) => {
   app.get('/users/:userId/carts', isAuth());
 

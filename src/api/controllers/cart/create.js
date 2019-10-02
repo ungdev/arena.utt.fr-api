@@ -1,5 +1,15 @@
 const isAuth = require('../../middlewares/isAuth');
 
+/**
+ * POST /users/:userID/carts
+ * {
+ *
+ * }
+ * Response
+ * {
+ *
+ * }
+ */
 module.exports = (app) => {
   app.post('/users/:userId/carts', isAuth());
 
@@ -19,8 +29,6 @@ module.exports = (app) => {
         transactionState: 'draft',
       },
     });
-
-    console.log('count : ' + draftCount);
 
     if (draftCount !== 0) {
       return res

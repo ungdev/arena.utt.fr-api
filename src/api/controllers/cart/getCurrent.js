@@ -1,5 +1,15 @@
 const isAuth = require('../../middlewares/isAuth');
 
+/**
+ * GET /users/:userId/carts/current
+ * {
+ *
+ * }
+ * Response
+ * {
+ *   Cart
+ * }
+ */
 module.exports = (app) => {
   app.get('/users/:userId/carts/current', isAuth());
 
@@ -13,7 +23,7 @@ module.exports = (app) => {
         .end();
     }
 
-    const carts = await Cart.findAll({
+    const cart = await Cart.findAll({
       limit: 1,
       attributes: ['id', 'paidAt', 'transactionId', 'transactionState'],
       where: {
@@ -36,7 +46,7 @@ module.exports = (app) => {
 
     return res
       .status(200)
-      .json(carts)
+      .json(cart)
       .end();
   });
 };
