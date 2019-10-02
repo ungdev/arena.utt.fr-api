@@ -5,9 +5,8 @@ const errorHandler = require('../../utils/errorHandler');
 const validateBody = require('../../middlewares/validateBody');
 
 /**
- * POST /carts/:cartId/cartitems
+ * PUT /carts/:cartId/cartitems/:id
  * {
- *  itemId: int
  *  quantity: int
  *  attributeId: int, optionnal
  *  forUserId: UUID, optionnal. For self if null
@@ -18,11 +17,9 @@ const validateBody = require('../../middlewares/validateBody');
  * }
  */
 module.exports = (app) => {
-  app.post('/carts/:cartId/cartitems', isAuth());
+  app.put('/carts/:cartId/cartitems/:id', isAuth());
 
-  app.post('/carts/:cartId/cartitems', [
-    check('itemId')
-      .isInt(),
+  app.put('/carts/:cartId/cartitems/:id', [
     check('quantity')
       .isInt(),
     check('attributeId')
@@ -34,10 +31,19 @@ module.exports = (app) => {
     validateBody(),
   ]);
 
-  app.post('/carts/:cartId/cartitems', async (req, res) => {
-    const { CartItem, User, Cart } = req.app.locals.models;
+  app.put('/carts/:cartId/cartitems/:id', async (req, res) => {
+    const { CartItem, User } = req.app.locals.models;
 
     try {
+      const cartItem = await CartItem.findByPk(req.params.id);
+
+      if (!cartItem) {
+        return res
+          .status(404)
+          .json({ error: 'ITEM_NOT_FOUND' })
+          .end();
+      }
+
       if (req.body.forUserId) {
         const user = await User.findByPk(req.body.forUserId);
         if (!user) {
@@ -49,30 +55,13 @@ module.exports = (app) => {
       }
       else req.body.forUserId = req.user.id;
 
-      // A modifier après pour l'admin
-      const cartCount = await Cart.count({
-        where: {
-          id: req.params.cartId,
-          userId: req.user.id,
-        },
-      });
+      cartItem.forUserId = req.body.forUserId;
+      cartItem.quantity = req.body.quantity;
+      cartItem.attributeId = req.body.attributeId;
 
-      if (cartCount !== 1) {
-        return res
-          .status(403)
-          .json({ error: 'UNAUTHORIZED' })
-          .end();
-      }
+      console.log(cartItem);
 
-      const cartItem = {
-        ...req.body,
-        userId: req.user.id, // Attention ! Pas compatible avec admin
-        cartId: req.params.cartId,
-      };
-
-      // Attention: pas de verification d'attribute si ça peut correspondre à un itemId
-      // Est-ce utile ?
-      await CartItem.create(cartItem);
+      await cartItem.save();
 
       return res
         .status(204)
