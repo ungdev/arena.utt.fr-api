@@ -59,8 +59,8 @@ module.exports = (app) => {
       cartItem.quantity = req.body.quantity;
       cartItem.attributeId = req.body.attributeId;
 
-      console.log(cartItem);
-
+      // Attention: pas de verification d'attribute si ça peut correspondre à un itemId
+      // Est-ce utile ?
       await cartItem.save();
 
       return res
