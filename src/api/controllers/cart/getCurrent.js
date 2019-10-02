@@ -51,8 +51,8 @@ module.exports = (app) => {
         .json(cart)
         .end();
     }
-    catch (error) {
-      return errorHandler(error, res);
+    catch (err) {
+      return errorHandler(err, res);
     }
   });
 };
