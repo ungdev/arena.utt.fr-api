@@ -36,12 +36,12 @@ module.exports = (app) => {
 
     try {
 
-      console.log("userId " + req.user.id);
 
       const cartItem = await CartItem.findOne({
         where: {
           id: req.params.id,
           userId: req.user.id,
+          cartId: req.params.cartId,
         },
       });
 
@@ -53,7 +53,7 @@ module.exports = (app) => {
       }
 
       if (req.body.forUserId) {
-        const user = await User.findByPk(req.body.forUserId);
+        const user = await User.findOne(req.body.forUserId);
         if (!user) {
           return res
             .status(404)

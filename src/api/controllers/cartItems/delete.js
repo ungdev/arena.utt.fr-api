@@ -23,6 +23,7 @@ module.exports = (app) => {
         where: {
           id: req.params.id,
           userId: req.user.id,
+          cartId: req.params.cartId,
         },
       });
 

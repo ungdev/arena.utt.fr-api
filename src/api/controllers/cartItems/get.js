@@ -22,6 +22,7 @@ module.exports = (app) => {
         where: {
           id: req.params.id,
           userId: req.user.id,
+          cartId: req.params.cartId,
         },
         attributes: ['id', 'quantity', 'forUserId'],
         include: [{
@@ -33,6 +34,13 @@ module.exports = (app) => {
         }],
 
       });
+
+      if (!cartItem) {
+        return res
+          .status(404)
+          .json({ error: 'NOT_FOUND' })
+          .end();
+      }
 
       return res
         .status(200)
