@@ -6,6 +6,10 @@ const errorHandler = require('../../utils/errorHandler');
  * {
  *
  * }
+ * Response
+ * {
+ *
+ * }
  */
 
 module.exports = (app) => {
