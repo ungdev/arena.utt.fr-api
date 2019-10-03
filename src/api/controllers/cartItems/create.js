@@ -5,7 +5,7 @@ const errorHandler = require('../../utils/errorHandler');
 const validateBody = require('../../middlewares/validateBody');
 
 /**
- * POST /carts/:cartId/cartitems
+ * POST /carts/:cartId/cartItems
  * {
  *  itemId: int
  *  quantity: int
@@ -18,9 +18,9 @@ const validateBody = require('../../middlewares/validateBody');
  * }
  */
 module.exports = (app) => {
-  app.post('/carts/:cartId/cartitems', isAuth());
+  app.post('/carts/:cartId/cartItems', [isAuth()]);
 
-  app.post('/carts/:cartId/cartitems', [
+  app.post('/carts/:cartId/cartItems', [
     check('itemId')
       .isInt(),
     check('quantity')
@@ -34,7 +34,7 @@ module.exports = (app) => {
     validateBody(),
   ]);
 
-  app.post('/carts/:cartId/cartitems', async (req, res) => {
+  app.post('/carts/:cartId/cartItems', async (req, res) => {
     const { CartItem, User, Cart } = req.app.locals.models;
 
     try {

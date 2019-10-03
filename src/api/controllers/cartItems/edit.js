@@ -5,7 +5,7 @@ const errorHandler = require('../../utils/errorHandler');
 const validateBody = require('../../middlewares/validateBody');
 
 /**
- * PUT /carts/:cartId/cartitems/:id
+ * PUT /carts/:cartId/cartItems/:id
  * {
  *  quantity: int
  *  attributeId: int, optionnal
@@ -17,9 +17,9 @@ const validateBody = require('../../middlewares/validateBody');
  * }
  */
 module.exports = (app) => {
-  app.put('/carts/:cartId/cartitems/:id', isAuth());
+  app.put('/carts/:cartId/cartItems/:id', [isAuth()]);
 
-  app.put('/carts/:cartId/cartitems/:id', [
+  app.put('/carts/:cartId/cartItems/:id', [
     check('quantity')
       .isInt(),
     check('attributeId')
@@ -31,11 +31,19 @@ module.exports = (app) => {
     validateBody(),
   ]);
 
-  app.put('/carts/:cartId/cartitems/:id', async (req, res) => {
+  app.put('/carts/:cartId/cartItems/:id', async (req, res) => {
     const { CartItem, User } = req.app.locals.models;
 
     try {
-      const cartItem = await CartItem.findByPk(req.params.id);
+
+      console.log("userId " + req.user.id);
+
+      const cartItem = await CartItem.findOne({
+        where: {
+          id: req.params.id,
+          userId: req.user.id,
+        },
+      });
 
       if (!cartItem) {
         return res
