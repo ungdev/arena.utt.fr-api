@@ -50,8 +50,8 @@ module.exports = (app) => {
         .json(cart)
         .end();
     }
-    catch (err) {
-      return errorHandler(err, res);
+    catch (error) {
+      return errorHandler(error, res);
     }
   });
 };

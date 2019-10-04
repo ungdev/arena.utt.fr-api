@@ -46,8 +46,8 @@ module.exports = (app) => {
         .end();
     }
 
-    catch (err) {
-      return errorHandler(err, res);
+    catch (error) {
+      return errorHandler(error, res);
     }
   });
 };
