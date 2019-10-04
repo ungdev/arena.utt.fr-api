@@ -25,8 +25,7 @@ module.exports = (app) => {
           .end();
       }
 
-      const cart = await Cart.findAll({
-        limit: 1,
+      const cart = await Cart.findOne({
         attributes: ['id', 'paidAt', 'transactionId', 'transactionState'],
         where: {
           userId: req.params.userId,
