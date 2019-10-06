@@ -6,14 +6,17 @@ const etupay = require('@ung/node-etupay')({
 });
 const generatePdf = require('../utils/sendPDF');
 const errorHandler = require('../utils/errorHandler');
+const sendPaymentMail = require('../mail/payment');
+const log = require('../utils/log')(module);
 
 module.exports = (app) => {
+  // todo: SLACK HOOKS !!!!! si differents + enregistrer !!!!!!!!!
   app.post('/user/pay/callback', (req, res) => res.status(204));
 
   app.get('/user/pay/return', etupay.middleware, async (req, res) => {
     // Jamais utilisée car géré par le middleware
 
-    const { Cart, CartItem, Item, Attribute, User, Team, Tournament } = req.app.locals.models;
+    const { Cart, CartItem, Item, Attribute, User } = req.app.locals.models;
 
     try {
       if (!req.query.payload) {
@@ -23,13 +26,13 @@ module.exports = (app) => {
       // Récupère le cartId depuis le payload envoyé à /carts/:id/pay
       const { cartId } = JSON.parse(Buffer.from(req.etupay.serviceData, 'base64').toString());
 
-      const cart = await Cart.findOne({
+      let cart = await Cart.findOne({
         where: {
           id: cartId,
           transactionState: 'draft',
         },
 
-        include: {
+        include: [{
           model: CartItem,
           attributes: ['id', 'quantity', 'forUserId'],
           include: [{
@@ -39,7 +42,10 @@ module.exports = (app) => {
             model: Attribute,
             attributes: ['label', 'value'],
           }],
-        },
+        }, {
+          model: User,
+          attributes: ['username', 'email'],
+        }],
       });
 
       if (!cart) {
@@ -55,42 +61,74 @@ module.exports = (app) => {
       }
 
       cart.paidAt = fn('NOW');
-      // todo: warning DEV
-      //await cart.save();
+      await cart.save();
 
+      // Comme les PDF prennent du temps à generer, on redirige le user avant
+      res.redirect(`${process.env.ARENA_ETUPAY_ERRORURL}&error=test`);
+
+      cart = cart.toJSON();
+
+      cart.cartItems = await Promise.all(cart.cartItems.map(async (cartItem) => {
+        const forUser = await User.findByPk(cartItem.forUserId, {
+          attributes: ['id', 'username', 'firstname', 'lastname', 'email', 'barcode'],
+        });
+
+        const newCartItem = {
+          ...cartItem,
+          forUser,
+        };
+
+        delete newCartItem.forUserId;
+        return newCartItem;
+      }));
 
       let pdfTickets = await Promise.all(cart.cartItems.map(async (cartItem) => {
         if (cartItem.item.key === 'player' || cartItem.item.key === 'visitor') {
           // todo: moche à cause de seuquelize, peut etre moyen de raccourcir en une requête
-          const forUser = await User.findByPk(cartItem.forUserId);
-          console.log(cartItem.item.name);
-          return generatePdf(forUser);
+
+          return generatePdf(cartItem.forUser, cartItem.item.name);
         }
         return null;
       }));
 
       pdfTickets = pdfTickets.filter((ticket) => ticket !== null);
 
+      const users = cart.cartItems.reduce(((previousValue, cartItem) => {
+        const indexUser = previousValue
+          .findIndex((user) => user.username === cartItem.forUser.username);
 
-      console.log(pdfTickets.length);
+        // Si il trouve
+        if (indexUser !== -1) {
+          previousValue[indexUser].items.push({
+            name: cartItem.item.name,
+            quantity: cartItem.quantity,
+            price: cartItem.item.price * cartItem.quantity,
+            attribute: cartItem.attribute ? cartItem.attribute.label : '',
+          });
+        }
+
+        else {
+          previousValue.push({
+            username: cartItem.forUser.username,
+            items: [{
+              name: cartItem.item.name,
+              quantity: cartItem.quantity,
+              price: cartItem.item.price * cartItem.quantity,
+            }],
+          });
+        }
+
+        return previousValue;
+      }), []);
 
 
-      /*
-      tickets = map(ticket)
-        genereatePdf(ticker)
-
-      SEND PAYEMETN MAIL(tickets)
-
-      */
-
-
-      // todo: DEV
-      return res
-        .status(200)
-        .json(pdfTickets.length)
-        .end();
-
-      // return res.redirect(process.env.ARENA_ETUPAY_SUCCESSURL);
+      await sendPaymentMail(cart.user.email, {
+        username: cart.user.username,
+        users,
+        link: '#', // todo: a changer !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      }, pdfTickets);
+      log.debug(`Mail sent to ${cart.user.email}`);
+      return null;
     }
     catch (err) {
       return errorHandler(err, res);

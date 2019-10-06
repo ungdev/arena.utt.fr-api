@@ -7,7 +7,7 @@ const PDFDocument = require('pdfkit');
 const path = require('path');
 const log = require('../utils/log')(module);
 
-const fond = `data:image/png;base64,${fs.readFileSync(path.join(__dirname, '../utils', 'assets', 'billet-ua.png'), 'base64')}`;
+const fond = `data:image/png;base64,${fs.readFileSync(path.join(__dirname, '../utils', 'assets', 'billet-ua.jpg'), 'base64')}`;
 
 
 const generateBarcode = (user) => new Promise((resolve, reject) => {
@@ -26,7 +26,7 @@ const generateBarcode = (user) => new Promise((resolve, reject) => {
   });
 });
 
-module.exports = (user) => new Promise(async (resolve) => {
+module.exports = (user, placeName) => new Promise(async (resolve) => {
   const doc = new PDFDocument({ size: [841.89, 595.28] });
 
   doc.image(fond, 0, 0, { width: doc.page.width, height: doc.page.height });
@@ -35,7 +35,7 @@ module.exports = (user) => new Promise(async (resolve) => {
     .font(path.join(__dirname, '../utils', 'assets', 'montserrat.ttf'))
     .fontSize(30)
     .fillColor('white')
-    .text(`${user.lastname} ${user.firstname}`, 400, 50);
+    .text(`${user.lastname} ${user.firstname}\n${placeName}`, 400, 50);
 
   const barecode = await generateBarcode(user);
 
