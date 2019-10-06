@@ -2,6 +2,7 @@ const fileUploader = require('express-fileupload')
 const fs = require('fs')
 const uuidv4 = require('uuid/v4')
 const log = require('../../utils/log')(module)
+const isAuth = require('../../middlewares/isAuth')
 
 const handleFileSaving = async (file) => {
   return new Promise((resolve, reject) => {
@@ -28,5 +29,6 @@ const uploadFile = async (request, response) => {
 
 module.exports = (app) => {
   app.use(fileUploader())
+  app.post('/files', [isAuth()])
   app.post('/files', uploadFile);
 };
