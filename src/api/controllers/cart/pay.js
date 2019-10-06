@@ -57,7 +57,14 @@ module.exports = (app) => {
         encoded,
       );
 
+      const isPartnerSchool = process.env.ARENA_PRICES_PARTNER_MAILS.split(',').some((school) => req.user.email.toLowerCase().endsWith(school));
+
       cart.cartItems.forEach((cartItem) => {
+        if (cartItem.item.key === 'player' && isPartnerSchool) {
+          // todo: HARDECODE !!!!!
+          cartItem.item.price = 15;
+        }
+
         const name = cartItem.attribute ? `${cartItem.item.name} (${cartItem.attribute.label})` : cartItem.item.name;
         basket.addItem(name, cartItem.item.price * euro, cartItem.quantity);
       });

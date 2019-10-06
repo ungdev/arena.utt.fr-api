@@ -1,4 +1,4 @@
-const {fn} = require('sequelize');
+const { fn } = require('sequelize');
 const etupay = require('@ung/node-etupay')({
   id: process.env.ARENA_ETUPAY_ID,
   url: process.env.ARENA_ETUPAY_URL,
