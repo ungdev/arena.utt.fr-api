@@ -64,7 +64,7 @@ module.exports = (app) => {
       await cart.save();
 
       // Comme les PDF prennent du temps à generer, on redirige le user avant
-      res.redirect(`${process.env.ARENA_ETUPAY_ERRORURL}&error=test`);
+      res.redirect(process.env.ARENA_ETUPAY_SUCCESSURL);
 
       cart = cart.toJSON();
 

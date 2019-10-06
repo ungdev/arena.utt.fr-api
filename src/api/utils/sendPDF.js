@@ -7,7 +7,7 @@ const PDFDocument = require('pdfkit');
 const path = require('path');
 const log = require('../utils/log')(module);
 
-const fond = `data:image/png;base64,${fs.readFileSync(path.join(__dirname, '../utils', 'assets', 'billet-ua.jpg'), 'base64')}`;
+const fond = `data:image/jpg;base64,${fs.readFileSync(path.join(__dirname, '../utils', 'assets', 'billet-ua.jpg'), 'base64')}`;
 
 
 const generateBarcode = (user) => new Promise((resolve, reject) => {
