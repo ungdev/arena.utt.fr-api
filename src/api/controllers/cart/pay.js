@@ -45,7 +45,7 @@ module.exports = (app) => {
           .end();
       }
 
-      const data = JSON.stringify({ userId: req.user.id, isInscription: true, orderId: cart.id });
+      const data = JSON.stringify({ cartId: cart.id });
       const encoded = Buffer.from(data).toString('base64');
 
       const basket = new Basket(
