@@ -22,12 +22,11 @@ module.exports = (app) => {
 
   app.post('/teams', [
     check('name')
-      .exists()
-      .matches(/^[A-zÀ-ÿ0-9 '#@!&\-$%]{3,}$/i)
+      .matches(/^[A-zÀ-ÿ0-9 '#@!&\-$%]*$/i)
       .isLength({ max: 40 }),
     check('tournament')
       .exists()
-      .matches(/\d/),
+      .isInt(),
     validateBody(),
   ]);
 
@@ -53,17 +52,30 @@ module.exports = (app) => {
 
       const team = await Team.create({
         name: req.body.name,
+        tournamentId: req.body.tournament,
       });
       await team.addUser(req.user);
       await team.setCaptain(req.user);
-      await tournament.addTeam(team);
+      req.user.askingTeamId = null;
       await req.user.save();
+      const outputUser = {
+        id: req.user.id,
+        firstname: req.user.firstname,
+        lastname: req.user.lastname,
+        username: req.user.username,
+        email: req.user.email,
+      };
 
       log.info(`user ${req.user.username} created team ${req.body.name}`);
 
       return res
         .status(200)
-        .json({ ...team.toJSON(), tournament: tournament.toJSON() })
+        .json({
+          ...team.toJSON(),
+          tournament: tournament.toJSON(),
+          users: [outputUser],
+          askingUsers: [],
+        })
         .end();
     }
     catch (err) {
