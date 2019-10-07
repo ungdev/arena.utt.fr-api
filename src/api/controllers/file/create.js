@@ -16,8 +16,12 @@ const handleFileSaving = async (file) => {
   });
 };
 
+const requestHasFile = request => request.files !== undefined && request.files.file !== undefined
 
 const uploadFile = async (request, response) => {
+  if (!requestHasFile(request)) {
+    return response.json({message: 'No file provided'}).status(400).end()
+  }
   try {
     const fileId = await handleFileSaving(request.files.file)
     return response.json({fileId: fileId}).status(200).end();
