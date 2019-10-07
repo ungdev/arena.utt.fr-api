@@ -29,6 +29,5 @@ const uploadFile = async (request, response) => {
 
 module.exports = (app) => {
   app.use(fileUploader())
-  app.post('/files', [isAuth()])
-  app.post('/files', uploadFile);
+  app.post('/files', [isAuth()], uploadFile);
 };
