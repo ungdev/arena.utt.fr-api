@@ -22,9 +22,24 @@ const handleFileSaving = async (file) => {
 
 const requestHasFile = request => request.files !== undefined && request.files.file !== undefined
 
+const fileHasAcceptableSize = request => {
+  const mega = 1000000
+  console.log(request.files.file.size)
+  if (requestHasFile(request)) {
+    const file = request.files.file
+    if (file.size < 5 * mega) {
+      return true
+    }
+  }
+  return false;
+}
+
 const uploadFile = async (request, response) => {
   if (!requestHasFile(request)) {
     return response.json({message: 'No file provided'}).status(400).end()
+  }
+  if (!fileHasAcceptableSize(request)) {
+    return response.json({message: 'File is too heavy'}).status(400).end()
   }
   try {
     const fileId = await handleFileSaving(request.files.file)
