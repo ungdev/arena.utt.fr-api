@@ -3,11 +3,15 @@ const fs = require('fs')
 const uuidv4 = require('uuid/v4')
 const log = require('../../utils/log')(module)
 const isAuth = require('../../middlewares/isAuth')
+const path = require('path')
+
+const UPLOAD_DIR = process.env.UPLOAD_DIR || './uploads/'
 
 const handleFileSaving = async (file) => {
   return new Promise((resolve, reject) => {
     const fileId = uuidv4();
-    file.mv('./uploads/' + fileId, (err) => {
+    const filePath = path.join(UPLOAD_DIR, fileId)
+    file.mv(filePath, (err) => {
       if (err) {
         reject(err);
       }
