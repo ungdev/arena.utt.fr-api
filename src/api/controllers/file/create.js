@@ -23,11 +23,12 @@ const handleFileSaving = async (file) => {
 const requestHasFile = request => request.files !== undefined && request.files.file !== undefined
 
 const fileHasAcceptableSize = request => {
-  const mega = 1000000
+  const numberOfMega = process.env.ARENA_FILE_SIZE || 5
+  const megabytes = 1000000 //one megabytes is 1000000 bytes
   console.log(request.files.file.size)
   if (requestHasFile(request)) {
     const file = request.files.file
-    if (file.size < 5 * mega) {
+    if (file.size <= numberOfMega * megabytes) {
       return true
     }
   }
