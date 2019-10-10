@@ -8,6 +8,9 @@ const log = require('../../utils/log')(module);
 const errorHandler = require('../../utils/errorHandler');
 const validateBody = require('../../middlewares/validateBody');
 
+const ITEM_PLAYER_ID = 1;
+const ITEM_VISITOR_ID = 2;
+
 /**
  * PUT /user/login
  * {
@@ -32,7 +35,7 @@ module.exports = (app) => {
   ]);
 
   app.post('/auth/login', async (req, res) => {
-    const { User, Team } = req.app.locals.models;
+    const { User, Team, Cart, CartItem } = req.app.locals.models;
 
     try {
       const { username, password } = req.body;
@@ -84,6 +87,20 @@ module.exports = (app) => {
         expiresIn: process.env.ARENA_API_SECRET_EXPIRES,
       });
 
+      const hasCartPaid = await Cart.count({
+        where: {
+          transactionState: 'paid',
+        },
+        include: [{
+          model: CartItem,
+          where: {
+            itemId: user.type === 'visitor' ? ITEM_VISITOR_ID : ITEM_PLAYER_ID,
+            forUserId: user.id,
+          },
+        }],
+      });
+      const isPaid = !!hasCartPaid;
+
       log.info(`user ${user.username} logged`);
 
       return res
@@ -97,6 +114,8 @@ module.exports = (app) => {
               lastname: user.lastname,
               email: user.email,
               team: user.team,
+              type: user.type,
+              isPaid,
             },
             token,
           },
