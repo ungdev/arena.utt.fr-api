@@ -58,7 +58,7 @@ module.exports = (app) => {
       const doc = await generateTicket(user, place.item.name);
 
       res.set('Content-Type', 'application/pdf');
-      res.send(doc);
+      return res.send(doc);
     }
     catch (err) {
       return errorHandler(err, res);
