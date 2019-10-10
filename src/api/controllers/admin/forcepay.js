@@ -3,7 +3,7 @@ const moment = require('moment');
 
 const hasPermission = require('../../middlewares/hasPermission');
 const isAuth = require('../../middlewares/isAuth');
-const sendPdf = require('../../utils/sendPDF');
+const generateTicket = require('../../utils/generateTicket');
 const errorHandler = require('../../utils/errorHandler');
 const validateBody = require('../../middlewares/validateBody');
 const log = require('../../utils/log')(module);
@@ -66,7 +66,7 @@ module.exports = (app) => {
       log.info(`Forced ${user.name}'s payment`);
 
       user = await User.findByPk(user.id, { include: [Team, Order] }); // add order to user
-      await sendPdf(user);
+      await generateTicket(user);
       log.info(`Mail sent to ${user.name}`);
 
       return res
