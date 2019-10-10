@@ -1,11 +1,12 @@
 const { check } = require('express-validator');
+const moment = require('moment');
+
 const hasPermission = require('../../middlewares/hasPermission');
 const isAuth = require('../../middlewares/isAuth');
 const sendPdf = require('../../utils/sendPDF');
 const errorHandler = require('../../utils/errorHandler');
 const validateBody = require('../../middlewares/validateBody');
 const log = require('../../utils/log')(module);
-const moment = require('moment');
 
 /**
  * POST /admin/forcepay
