@@ -18,19 +18,18 @@ const errorHandler = require("../../utils/errorHandler");
  *    token: String
  * }
  */
-const Login = models => {
+const Login = (userModel, teamModel)=> {
   return async (request, response) => {
-    const { User, Team } = models;
     try {
       const { username, password } = request.body;
 
       // Get user
-      const user = await User.findOne({
+      const user = await userModel.findOne({
         where: {
           [Op.or]: [{ username }, { email: username }]
         },
         include: {
-          model: Team,
+          model: teamModel,
           attributes: ["id", "name"]
         }
       });
