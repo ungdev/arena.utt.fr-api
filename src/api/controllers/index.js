@@ -17,7 +17,7 @@ const mainRoutes = models => {
     const mainRouter = Express.Router();
     mainRouter.use('/auth', Auth(models));
     mainRouter.use('/carts', [isAuth()], Cart(models));
-    mainRouter.use('/users', [isAuth()], User(models));
+    mainRouter.use('/users', User(models));
     return mainRouter;
 };
 
