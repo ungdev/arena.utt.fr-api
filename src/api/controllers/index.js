@@ -12,12 +12,14 @@ const log = require('../utils/log')(module);
 const Auth = require('./auth');
 const Cart = require('./cart');
 const User = require('./user');
+const Tournament = require('./tournament');
 
 const mainRoutes = models => {
     const mainRouter = Express.Router();
     mainRouter.use('/auth', Auth(models));
-    mainRouter.use('/carts', [isAuth()], Cart(models));
     mainRouter.use('/users', User(models));
+    mainRouter.use('/tournaments', [isAuth()], Tournament(models));
+    mainRouter.use('/carts', [isAuth()], Cart(models));
     return mainRouter;
 };
 
