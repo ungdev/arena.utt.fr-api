@@ -6,6 +6,19 @@ const isAuth = require('../../middlewares/isAuth');
 const errorHandler = require('../../utils/errorHandler');
 const log = require('../../utils/log')(module);
 
+const CheckEdit = [
+    check('username').isLength({ min: 3, max: 100 }),
+    check('lastname').isLength({ min: 2, max: 100 }),
+    check('firstname').isLength({ min: 2, max: 100 }),
+    check('oldpassword')
+        .optional()
+        .isLength({ min: 6 }),
+    check('password')
+        .optional()
+        .isLength({ min: 6 }),
+    validateBody(),
+];
+
 /**
  * PUT /users/:id
  * {
@@ -21,76 +34,62 @@ const log = require('../../utils/log')(module);
  *
  * }
  */
-module.exports = (app) => {
-  app.put('/users/:id', [isAuth()]);
+const Edit = () => {
+    return async (req, res) => {
+        try {
+            // todo: refaire pour admins
+            if (req.params.userId !== req.user.id) {
+                return res
+                    .status(403)
+                    .json({ error: 'UNAUTHORIZED' })
+                    .end();
+            }
 
-  app.put('/users/:id', [
-    check('username')
-      .isLength({ min: 3, max: 100 }),
-    check('lastname')
-      .isLength({ min: 2, max: 100 }),
-    check('firstname')
-      .isLength({ min: 2, max: 100 }),
-    check('oldpassword')
-      .optional()
-      .isLength({ min: 6 }),
-    check('password')
-      .optional()
-      .isLength({ min: 6 }),
-    validateBody(),
-  ]);
+            if (req.body.password && req.body.oldpassword) {
+                req.body.oldpassword = await bcrypt.hash(
+                    req.body.oldpassword,
+                    parseInt(process.env.ARENA_API_BCRYPT_LEVEL, 10)
+                );
 
-  app.put('/users/:id', async (req, res) => {
-    try {
-      // todo: refaire pour admins
-      if (req.params.id !== req.user.id) {
-        return res
-          .status(403)
-          .json({ error: 'UNAUTHORIZED' })
-          .end();
-      }
+                const passwordMatches = bcrypt.compare(
+                    req.body.oldpassword,
+                    req.user.password
+                );
 
-      if (req.body.password && req.body.oldpassword) {
-        req.body.oldpassword = await bcrypt.hash(
-          req.body.oldpassword,
-          parseInt(process.env.ARENA_API_BCRYPT_LEVEL, 10),
-        );
+                if (!passwordMatches) {
+                    return res
+                        .status(400)
+                        .json({ error: 'WRONG_PASSWORD' })
+                        .end();
+                }
 
-        const passwordMatches = bcrypt.compare(req.body.oldpassword, req.user.password);
+                req.body.password = await bcrypt.hash(
+                    req.body.password,
+                    parseInt(process.env.ARENA_API_BCRYPT_LEVEL, 10)
+                );
+            }
 
-        if (!passwordMatches) {
-          return res
-            .status(400)
-            .json({ error: 'WRONG_PASSWORD' })
-            .end();
+            const { firstname, lastname, username, password } = req.body;
+            const userUpdated = {
+                id: req.params.id,
+                username,
+                firstname,
+                lastname,
+                password,
+            };
+
+            await req.user.update(userUpdated);
+
+            log.info(`user ${req.body.name} updated`);
+
+            return res
+                .status(200)
+                .json(userUpdated)
+                .end();
+        } catch (err) {
+            return errorHandler(err, res);
         }
-
-        req.body.password = await bcrypt.hash(
-          req.body.password,
-          parseInt(process.env.ARENA_API_BCRYPT_LEVEL, 10),
-        );
-      }
-
-      const { firstname, lastname, username, password } = req.body;
-      const userUpdated = {
-        id: req.params.id,
-        username,
-        firstname,
-        lastname,
-        password,
-      };
-
-      await req.user.update(userUpdated);
-
-      log.info(`user ${req.body.name} updated`);
-
-      return res
-        .status(200)
-        .json(userUpdated)
-        .end();
-    }
-    catch (err) {
-      return errorHandler(err, res);
-    }
-  });
+    };
 };
+
+module.exports = { Edit, CheckEdit };
