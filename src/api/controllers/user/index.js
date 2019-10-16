@@ -1,10 +1,12 @@
 const Express = require('express');
 
+const isAuth = require('../../middlewares/isAuth');
+
 const { Edit, CheckEdit } = require('./edit.js');
 const { List, CheckList } = require('./list.js');
 const Get = require('./get.js');
 const { Register, CheckRegister } = require('./register.js');
-const isAuth = require('../../middlewares/isAuth');
+const GetTicket = require('./getTicket.js');
 
 const User = models => {
     const router = Express.Router();
@@ -30,6 +32,11 @@ const User = models => {
         )
     );
     router.post('/', CheckRegister, Register(models.User));
+    router.get(
+        '/:userId/ticket',
+        [isAuth()],
+        GetTicket(models.User, models.CartItem, models.Item, models.Cart)
+    );
     return router;
 };
 
