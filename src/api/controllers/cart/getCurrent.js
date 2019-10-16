@@ -15,7 +15,7 @@ module.exports = (app) => {
   app.get('/users/:userId/carts/current', isAuth());
 
   app.get('/users/:userId/carts/current', async (req, res) => {
-    const { Cart, Item, CartItem, Attribute } = req.app.locals.models;
+    const { Cart, Item, CartItem, Attribute, User } = req.app.locals.models;
 
     try {
       if (req.params.userId !== req.user.id) {
@@ -37,17 +37,28 @@ module.exports = (app) => {
           attributes: ['id', 'quantity', 'forUserId'],
           include: [{
             model: Item,
-            attributes: ['name', 'key', 'price', 'stock', 'infos'],
+            attributes: ['id', 'name', 'key', 'price', 'stock', 'infos'],
           }, {
             model: Attribute,
-            attributes: ['label', 'value'],
+            attributes: ['label', 'value', 'id'],
           }],
         },
       });
 
+      // Parse sequelize entity to plain object
+      // https://stackoverflow.com/questions/21961818/sequelize-convert-entity-to-plain-object
+      const resCart = JSON.parse(JSON.stringify(cart));
+
+      if (resCart && resCart.cartItems) {
+        await Promise.all(resCart.cartItems.map(async (item, i) => {
+          const forUser = await User.findByPk(item.forUserId);
+          resCart.cartItems[i].forEmail = forUser.email;
+        }));
+      }
+
       return res
         .status(200)
-        .json(cart)
+        .json(resCart)
         .end();
     }
     catch (error) {

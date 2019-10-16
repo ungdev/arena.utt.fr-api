@@ -1,6 +1,7 @@
 const isAuth = require('../../middlewares/isAuth');
 const errorHandler = require('../../utils/errorHandler');
 const log = require('../../utils/log')(module);
+const isType = require('../../middlewares/isType');
 
 /**
  * DELETE /teams/:id/users/:userId
@@ -14,7 +15,7 @@ const log = require('../../utils/log')(module);
  * }
  */
 module.exports = (app) => {
-  app.delete('/teams/:id/users/:userId', [isAuth()]);
+  app.delete('/teams/:id/users/:userId', [isAuth(), isType('player')]);
 
   app.delete('/teams/:id/users/:userId', async (req, res) => {
     const { User, Team } = req.app.locals.models;
@@ -56,6 +57,7 @@ module.exports = (app) => {
       }
       if (user.team.captainId === req.user.id || req.params.userId === req.user.id) {
         user.teamId = null;
+        user.type = 'none';
         await user.save();
         return res
           .status(200)

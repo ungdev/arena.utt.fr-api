@@ -18,13 +18,15 @@ const CheckEdit = [
         .isLength({ min: 6 }),
     validateBody(),
 ];
+const ITEM_PLAYER_ID = 1;
+const ITEM_VISITOR_ID = 2;
 
 /**
  * PUT /users/:id
  * {
- *   username: String
- *   lastname: String
  *   firstname: String
+ *   lastname: String
+ *   username: String
  *   (password): String,
  *   (oldPassword): String
  * }
@@ -34,7 +36,7 @@ const CheckEdit = [
  *
  * }
  */
-const Edit = () => {
+const Edit = (cartModel, cartItemModel) => {
     return async (req, res) => {
         try {
             // todo: refaire pour admins
@@ -70,12 +72,52 @@ const Edit = () => {
             }
 
             const { firstname, lastname, username, password } = req.body;
+
+            let { type } = req.user;
+
+            if (req.body.type) {
+                const hasCartPaid = await cartModel.count({
+                    where: {
+                        transactionState: 'paid',
+                    },
+                    include: [
+                        {
+                            model: cartItemModel,
+                            where: {
+                                itemId:
+                                    req.user.type === 'visitor'
+                                        ? ITEM_VISITOR_ID
+                                        : ITEM_PLAYER_ID,
+                                forUserId: req.user.id,
+                            },
+                        },
+                    ],
+                });
+                const isPaid = !!hasCartPaid;
+
+                if (!isPaid) {
+                    // Allow to change type only if user has not paid
+                    type = req.body.type;
+                } else {
+                    return res
+                        .status(400)
+                        .json({ error: 'CANNOT_CHANGE' })
+                        .end();
+                }
+            }
+
             const userUpdated = {
-                id: req.params.id,
+                id: req.params.userId,
                 username,
                 firstname,
                 lastname,
                 password,
+                type,
+                email: req.user.email,
+                askingTeamId:
+                    req.body.type === 'visitor' && req.user.askingTeamId
+                        ? null
+                        : req.user.askingTeamId,
             };
 
             await req.user.update(userUpdated);

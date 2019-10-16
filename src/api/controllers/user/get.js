@@ -1,5 +1,8 @@
-const isAuth = require('../../middlewares/isAuth');
 const errorHandler = require('../../utils/errorHandler');
+
+const ITEM_PLAYER_ID = 1;
+const ITEM_VISITOR_ID = 2;
+
 /**
  * GET /users/:id
  * {
@@ -12,11 +15,10 @@ const errorHandler = require('../../utils/errorHandler');
  * }
  */
 // todo: admin chekc
-const Get = (userModel, teamModel) => {
+const Get = (userModel, teamModel, cartModel, cartItemModel) => {
     return async (req, res) => {
-        const userId = req.params.userId;
         try {
-            const user = await userModel.findByPk(userId, {
+            const user = await userModel.findByPk(req.params.userId, {
                 attributes: [
                     'id',
                     'username',
@@ -24,6 +26,7 @@ const Get = (userModel, teamModel) => {
                     'lastname',
                     'email',
                     'askingTeamId',
+                    'type',
                 ],
                 include: {
                     model: teamModel,
@@ -36,16 +39,29 @@ const Get = (userModel, teamModel) => {
                     .status(404)
                     .json({ error: 'NOT_FOUND' })
                     .end();
-            if (userId !== user.id) {
-                return res
-                    .status(403)
-                    .json({ error: 'UNAUTHORIZED' })
-                    .end();
-            }
+
+            const hasCartPaid = await cartModel.count({
+                where: {
+                    transactionState: 'paid',
+                },
+                include: [
+                    {
+                        model: cartItemModel,
+                        where: {
+                            itemId:
+                                user.type === 'visitor'
+                                    ? ITEM_VISITOR_ID
+                                    : ITEM_PLAYER_ID,
+                            forUserId: user.id,
+                        },
+                    },
+                ],
+            });
+            const isPaid = !!hasCartPaid;
 
             return res
                 .status(200)
-                .json(user)
+                .json({ ...user.toJSON(), isPaid })
                 .end();
         } catch (error) {
             return errorHandler(error, res);

@@ -1,15 +1,17 @@
 const { Op } = require('sequelize');
+const { check } = require('express-validator');
 
+const validateBody = require('../../middlewares/validateBody');
 const isAuth = require('../../middlewares/isAuth');
 const errorHandler = require('../../utils/errorHandler');
+
+const ITEM_PLAYER_ID = 1;
+const ITEM_VISITOR_ID = 2;
 
 /**
  * GET /users
  * Query Params: {
- *    exact: bool. Should the email or the username exactly match in the DB ?
- *    or: bool. Should we search for matching email OR username ? Default operator is AND.
  *    email: String
- *    username: String
  * }
  *
  * Response
@@ -20,37 +22,21 @@ const errorHandler = require('../../utils/errorHandler');
 module.exports = (app) => {
   app.get('/users', [isAuth()]);
 
+  app.get('/users', [
+    check('email')
+      .isEmail(),
+    validateBody(),
+  ]);
+
   app.get('/users', async (req, res) => {
-    const { User, Team, Tournament } = req.app.locals.models;
-
-    const exact = typeof req.query.exact !== 'undefined';
-    const or = typeof req.query.or !== 'undefined';
-
-    // Compute 'where' parameters
-    const reqWhere = [];
-    if (req.query.email) {
-      reqWhere.push({
-        email: exact
-          ? req.query.email
-          : { [Op.like]: `%${req.query.email || ''}%` },
-      });
-    }
-    if (req.query.username) {
-      reqWhere.push({
-        username: exact
-          ? req.query.username
-          : { [Op.like]: `%${req.query.username || ''}%` },
-      });
-    }
+    const { User, Team, Tournament, Cart, CartItem } = req.app.locals.models;
 
     try {
-      const users = await User.findAll({
-        attributes: ['username', 'firstname', 'lastname'],
-        where: Object.values(reqWhere).length > 0
-          ? {
-            [or ? Op.or : Op.and]: reqWhere,
-          }
-          : {},
+      const user = await User.findOne({
+        attributes: ['id', 'username', 'firstname', 'lastname', 'type'],
+        where: {
+          email: req.query.email,
+        },
         include: {
           model: Team,
           attributes: ['name'],
@@ -61,9 +47,51 @@ module.exports = (app) => {
         },
       });
 
+      if (!user) {
+        return res
+          .status(404)
+          .json({ error: 'USER_NOT_FOUND' })
+          .end();
+      }
+
+      const isPaid = await Cart.count({
+        where: {
+          transactionState: 'paid',
+        },
+        include: [{
+          model: CartItem,
+          where: {
+            forUserId: user.id,
+            itemId: {
+              [Op.in]: [ITEM_PLAYER_ID, ITEM_VISITOR_ID],
+            },
+          },
+        }],
+      });
+      const noTeam = user.team === null && user.type === 'player';
+      const isNone = user.type === 'none';
+      if (isPaid) {
+        return res
+          .status(400)
+          .json({ error: 'ALREADY_PAID' })
+          .end();
+      }
+      if (isNone) {
+        return res
+          .status(400)
+          .json({ error: 'NO_TYPE' })
+          .end();
+      }
+      if (noTeam) {
+        return res
+          .status(400)
+          .json({ error: 'NO_TEAM' })
+          .end();
+      }
+
       return res
         .status(200)
-        .json(users)
+        .json(user)
         .end();
     }
 
