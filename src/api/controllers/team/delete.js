@@ -8,20 +8,22 @@ const isType = require('../../middlewares/isType');
  *
  * Response:
  */
-module.exports = (app) => {
-  app.delete('/teams/:id', [isAuth(), isCaptain(), isType('player')]);
-
-  app.delete('/teams/:id', async (req, res) => {
-    try {
-      req.user.type = 'none';
-      await req.user.save();
-      await req.user.team.destroy();
-      return res
-        .status(204)
-        .end();
-    }
-    catch (err) {
-      return errorHandler(err, res);
-    }
-  });
+const Delete = (teamIdString, teamModel) => {
+    return async (req, res) => {
+        const teamId = req.params[teamIdString] || -1;
+        console.log(teamId);
+        if (teamId == -1) {
+            return res.json({ message: 'no team id given.' }).end(400);
+        }
+        try {
+            req.user.type = 'none';
+            await req.user.save();
+            await req.user.team.destroy();
+            return res.status(204).end();
+        } catch (err) {
+            return errorHandler(err, res);
+        }
+    };
 };
+
+module.exports = Delete;

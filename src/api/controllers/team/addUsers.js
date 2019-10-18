@@ -6,6 +6,7 @@ const isType = require('../../middlewares/isType');
 const errorHandler = require('../../utils/errorHandler');
 const log = require('../../utils/log')(module);
 
+const CheckAddUser = [check('user').isUUID(), validateBody()];
 /**
  * POST /teams/:id/users
  * {
@@ -17,56 +18,53 @@ const log = require('../../utils/log')(module);
  *
  * }
  */
-module.exports = (app) => {
-  app.post('/teams/:id/users', [
-    isAuth(),
-    isCaptain(),
-    isType('player'),
-  ]);
+const AddUser = (teamIdString, userModel, teamModel, tournamentModel) => {
+    return async (req, res) => {
+        try {
+            const team = await teamModel.findByPk(req.params[teamIdString], {
+                include: [
+                    {
+                        model: userModel,
+                        attributes: ['id']
+                    },
+                    {
+                        model: tournamentModel,
+                        attributes: ['playersPerTeam']
+                    }
+                ]
+            });
+            const user = await userModel.findByPk(req.body.user, {
+                where: {
+                    askingTeamId: team.id
+                }
+            });
 
-  app.post('/teams/:id/users', [
-    check('user')
-      .isUUID(),
-    validateBody(),
-  ]);
+            if (team && team.users.length === team.tournament.playersPerTeam) {
+                return res
+                    .status(400)
+                    .json({ error: 'TEAM_FULL' })
+                    .end();
+            }
+            if (user) {
+                user.teamId = team.id;
+                user.askingTeamId = null;
+                user.type = 'player';
+                await user.save();
 
-  app.post('/teams/:id/users', async (req, res) => {
-    try {
-      const { User, Team, Tournament } = req.app.locals.models;
-      const team = await Team.findByPk(req.params.id, {
-        include: [{
-          model: User,
-          attributes: ['id'],
-        }, {
-          model: Tournament,
-          attributes: ['playersPerTeam'],
-        }],
-      });
-      const user = await User.findByPk(req.body.user, {
-        where: {
-          askingTeamId: team.id,
-        },
-      });
+                log.info(
+                    `user ${req.user.username} accepted user ${user.username}`
+                );
 
-      if (team && team.users.length === team.tournament.playersPerTeam) {
-        return res.status(400).json({ error: 'TEAM_FULL' }).end();
-      }
-      if (user) {
-        user.teamId = team.id;
-        user.askingTeamId = null;
-        user.type = 'player';
-        await user.save();
-
-        log.info(`user ${req.user.username} accepted user ${user.username}`);
-
-        return res
-          .status(200)
-          .end();
-      }
-      return res.status(404).json({ error: 'NOT_ASKING_USER' }).end();
-    }
-    catch (err) {
-      return errorHandler(err, res);
-    }
-  });
+                return res.status(200).end();
+            }
+            return res
+                .status(404)
+                .json({ error: 'NOT_ASKING_USER' })
+                .end();
+        } catch (err) {
+            return errorHandler(err, res);
+        }
+    };
 };
+
+module.exports = { AddUser, CheckAddUser };
