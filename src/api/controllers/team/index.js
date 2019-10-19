@@ -7,8 +7,10 @@ const isType = require('../../middlewares/isType.js');
 const { Create, CheckCreate } = require('./create.js');
 const Delete = require('./delete.js');
 const { AddUser, CheckAddUser } = require('./addUsers.js');
+const DeleteUserFromTeam = require('./deleteUser.js');
 
 const teamId = 'teamId';
+const userId = 'userId';
 
 const Team = models => {
     const router = Express.Router();
@@ -26,6 +28,11 @@ const Team = models => {
         `/:${teamId}`,
         [isCaptain(teamId), isType('player'), CheckAddUser],
         AddUser(teamId, models.User, models.Team, models.Tournament)
+    );
+    router.delete(
+        `/:${teamId}/users/:${userId}`,
+        [isType('player')],
+        DeleteUserFromTeam(teamId, userId, models.User, models.Team)
     );
     return router;
 };
