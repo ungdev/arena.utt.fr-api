@@ -60,7 +60,7 @@ const Get = (
                                 },
                             ],
                         });
-                        return { username, email, id, isPaid: !!isCartPaid };
+                        return { username, id, isPaid: !!isCartPaid };
                     })
                 );
                 askingUsers = askingUsers.map(({ username, email, id }) => ({
