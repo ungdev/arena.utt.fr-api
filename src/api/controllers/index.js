@@ -8,6 +8,7 @@ const Cart = require('./cart');
 const User = require('./user');
 const Tournament = require('./tournament');
 const Team = require('./team');
+const Item = require('./items');
 
 const MainRoutes = models => {
     const mainRouter = Express.Router();
@@ -16,6 +17,7 @@ const MainRoutes = models => {
     mainRouter.use('/tournaments', [isAuth()], Tournament(models));
     mainRouter.use('/carts', [isAuth()], Cart(models));
     mainRouter.use('/teams', [isAuth()], Team(models));
+    mainRouter.use('/items', [isAuth()], Item(models));
     return mainRouter;
 };
 
