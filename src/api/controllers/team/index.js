@@ -3,11 +3,13 @@ const Express = require('express');
 const isNotInTeam = require('../../middlewares/isNotInTeam.js');
 const isCaptain = require('../../middlewares/isCaptain.js');
 const isType = require('../../middlewares/isType.js');
+const isSelfTeam = require('../../middlewares/isSelfTeam.js');
 
 const { Create, CheckCreate } = require('./create.js');
 const Delete = require('./delete.js');
 const { AddUser, CheckAddUser } = require('./addUsers.js');
 const DeleteUserFromTeam = require('./deleteUser.js');
+const Get = require('./get.js');
 
 const teamId = 'teamId';
 const userId = 'userId';
@@ -42,6 +44,19 @@ const Team = models => {
         `/:${teamId}/users/:${userId}`,
         [isType('player')],
         DeleteUserFromTeam(teamId, userId, models.User, models.Team)
+    );
+
+    router.get(
+        `/:${teamId}`,
+        [isSelfTeam(teamId)],
+        Get(
+            teamId,
+            models.Team,
+            models.User,
+            models.Tournament,
+            models.Cart,
+            models.CartItem
+        )
     );
     return router;
 };
