@@ -12,6 +12,8 @@ const DeleteUserFromTeam = require('./deleteUser.js');
 const Get = require('./get.js');
 const { Edit, CheckEdit } = require('./edit.js');
 const List = require('./list.js');
+const Request = require('./request.js');
+const { RefuseRequest, CheckRefuseRequest } = require('./refuse.js');
 
 const teamId = 'teamId';
 const userId = 'userId';
@@ -68,6 +70,15 @@ const Team = models => {
     );
 
     router.get('/', List(models.Team, models.Tournament, models.User));
+    router.post(
+        `/:${teamId}/request`,
+        Request(teamId, models.Team, models.User, models.Tournament)
+    );
+    router.delete(
+        `/:${teamId}/request`,
+        [CheckRefuseRequest],
+        RefuseRequest(teamId, models.User)
+    );
     return router;
 };
 module.exports = Team;
