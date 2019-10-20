@@ -10,6 +10,8 @@ const Delete = require('./delete.js');
 const { AddUser, CheckAddUser } = require('./addUsers.js');
 const DeleteUserFromTeam = require('./deleteUser.js');
 const Get = require('./get.js');
+const { Edit, CheckEdit } = require('./edit.js');
+const List = require('./list.js');
 
 const teamId = 'teamId';
 const userId = 'userId';
@@ -46,6 +48,8 @@ const Team = models => {
         DeleteUserFromTeam(teamId, userId, models.User, models.Team)
     );
 
+    router.put(`/:${teamId}`, [isType('player')], Edit(teamId, models.Team));
+
     router.get(
         `/:${teamId}`,
         [isSelfTeam(teamId)],
@@ -58,6 +62,8 @@ const Team = models => {
             models.CartItem
         )
     );
+
+    router.get('/', List(models.Team, models.Tournament, models.User));
     return router;
 };
 module.exports = Team;
