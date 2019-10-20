@@ -12,6 +12,15 @@ const DeleteUserFromTeam = require('./deleteUser.js');
 const teamId = 'teamId';
 const userId = 'userId';
 
+/**
+ * defines all routes for the Team resource :
+ * + POST `/teams/` create a team
+ * + POST `/teams/{teamId}` add a user to the team
+ * + DELETE `/teams/{id}` delete a team
+ * + DELETE `/teams/{teamId}` delete a user from the team
+ *
+ * @param {*} models
+ */
 const Team = models => {
     const router = Express.Router();
     router.post(
