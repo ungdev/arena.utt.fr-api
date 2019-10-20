@@ -48,7 +48,11 @@ const Team = models => {
         DeleteUserFromTeam(teamId, userId, models.User, models.Team)
     );
 
-    router.put(`/:${teamId}`, [isType('player')], Edit(teamId, models.Team));
+    router.put(
+        `/:${teamId}`,
+        [isType('player'), CheckEdit],
+        Edit(teamId, models.Team)
+    );
 
     router.get(
         `/:${teamId}`,
