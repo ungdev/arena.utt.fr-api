@@ -18,6 +18,7 @@ const MainRoutes = models => {
     mainRouter.use('/carts', [isAuth()], Cart(models));
     mainRouter.use('/teams', [isAuth()], Team(models));
     mainRouter.use('/items', [isAuth()], Item(models));
+    mainRouter.use('/carditems');
     return mainRouter;
 };
 
