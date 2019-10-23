@@ -37,8 +37,6 @@ module.exports = async () => {
     api.use(error.notFound);
     api.use(error.handler);
 
-    return api;
-
     // const server = http.Server(app);
     const io = socket(http, sequelize, models);
 
