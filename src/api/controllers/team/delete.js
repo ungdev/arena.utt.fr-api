@@ -4,17 +4,15 @@ const isCaptain = require('../../middlewares/isCaptain');
 const isType = require('../../middlewares/isType');
 
 /**
+ * Delete a team
+ *
  * DELETE /teams/:id
  *
  * Response:
  */
-const Delete = (teamIdString, teamModel) => {
+const Delete = teamIdString => {
     return async (req, res) => {
-        const teamId = req.params[teamIdString] || -1;
-        console.log(teamId);
-        if (teamId == -1) {
-            return res.json({ message: 'no team id given.' }).end(400);
-        }
+        const teamId = req.params[teamIdString];
         try {
             req.user.type = 'none';
             await req.user.save();
