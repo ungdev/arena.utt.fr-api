@@ -9,8 +9,10 @@ const { Register, CheckRegister } = require('./register.js');
 const GetTicket = require('./getTicket.js');
 const GetUserCart = require('./getUserCart.js');
 const ListCartsFromUser = require('./list-carts.js');
+const PayCart = require('./pay-cart.js');
 
 const userId = 'userId';
+const cartId = 'cartId';
 
 const User = models => {
     const router = Express.Router();
@@ -60,6 +62,21 @@ const User = models => {
             userId,
             models.Cart,
             models.Item,
+            models.CartItem,
+            models.Attribute
+        )
+    );
+    router.post(
+        `/:${userId}/carts/:${cartId}/pay`,
+        [isAuth()],
+        PayCart(
+            userId,
+            cartId,
+            models.User,
+            models.Tournament,
+            models.Team,
+            models.Item,
+            models.Cart,
             models.CartItem,
             models.Attribute
         )
