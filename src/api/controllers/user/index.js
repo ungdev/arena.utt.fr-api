@@ -15,19 +15,14 @@ const cartId = 'cartId';
 
 const User = models => {
     const router = Express.Router();
-    router.put(
-        '/:userId',
-        [isAuth(), ...CheckEdit],
-        Edit(models.Cart, models.ItemModel)
-    );
+    router.put('/:userId', [CheckEdit], Edit(models.Cart, models.ItemModel));
     router.get(
         '/:userId',
-        isAuth(),
         Get(models.User, models.Team, models.Cart, models.CartItem)
     );
     router.get(
         '/',
-        [isAuth(), ...CheckList],
+        [CheckList],
         List(
             models.User,
             models.Team,
@@ -38,12 +33,10 @@ const User = models => {
     );
     router.get(
         '/:userId/ticket',
-        [isAuth()],
         GetTicket(models.User, models.CartItem, models.Item, models.Cart)
     );
     router.get(
         `/:${userId}/carts`,
-        [isAuth()],
         GetUserCart(
             userId,
             models.Cart,
@@ -55,7 +48,6 @@ const User = models => {
     );
     router.get(
         `/:${userId}/carts`,
-        [isAuth()],
         ListCartsFromUser(
             userId,
             models.Cart,
@@ -66,7 +58,6 @@ const User = models => {
     );
     router.post(
         `/:${userId}/carts/:${cartId}/pay`,
-        [isAuth()],
         PayCart(
             userId,
             cartId,
