@@ -1,9 +1,9 @@
 const { fn } = require('sequelize');
-const etupay = require('../utils/etupay');
-const generateTicket = require('../utils/generateTicket');
-const errorHandler = require('../utils/errorHandler');
-const mail = require('../mail');
-const log = require('../utils/log')(module);
+const etupay = require('../../utils/etupay');
+const generateTicket = require('../../utils/generateTicket');
+const errorHandler = require('../../utils/errorHandler');
+const mail = require('../../mail');
+const log = require('../../utils/log')(module);
 
 // todo: SLACK HOOKS !!!!! si differents + enregistrer !!!!!!!!!
 //app.post('/carts/callback', (req, res) =>
