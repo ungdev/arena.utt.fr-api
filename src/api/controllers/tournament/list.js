@@ -1,4 +1,5 @@
 const errorHandler = require('../../utils/errorHandler');
+const hasTeamPaid = require('../../utils/hasTeamPaid.js');
 
 /**
  * Get all the tournaments
@@ -41,7 +42,7 @@ const List = (tournamentModel, teamModel, userModel) => {
                             let isPaid = true;
                             let notFull = true;
                             if (req.query.paidOnly === 'true') {
-                                isPaid = await isTeamPaid(
+                                isPaid = await hasTeamPaid(
                                     req,
                                     team,
                                     null,
