@@ -7,6 +7,9 @@ const { List, CheckList } = require('./list.js');
 const Get = require('./get.js');
 const { Register, CheckRegister } = require('./register.js');
 const GetTicket = require('./getTicket.js');
+const GetUserCart = require('./getUserCart.js');
+
+const userId = 'userId';
 
 const User = models => {
     const router = Express.Router();
@@ -36,6 +39,18 @@ const User = models => {
         '/:userId/ticket',
         [isAuth()],
         GetTicket(models.User, models.CartItem, models.Item, models.Cart)
+    );
+    router.get(
+        `/:${userId}/carts`,
+        [isAuth()],
+        GetUserCart(
+            userId,
+            models.Cart,
+            models.Item,
+            models.CartItem,
+            models.Attribute,
+            models.User
+        )
     );
     return router;
 };
