@@ -8,8 +8,8 @@ module.exports = idName => async (req, res, next) => {
     const team = await Team.count({
         where: {
             captainId: req.user.id,
-            id: req.params[idString]
-        }
+            id: req.params[idString],
+        },
     });
     if (!team) {
         return res

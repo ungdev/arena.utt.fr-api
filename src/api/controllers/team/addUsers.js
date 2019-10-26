@@ -1,8 +1,5 @@
 const { check } = require('express-validator');
 const validateBody = require('../../middlewares/validateBody');
-const isAuth = require('../../middlewares/isAuth');
-const isCaptain = require('../../middlewares/isCaptain');
-const isType = require('../../middlewares/isType');
 const errorHandler = require('../../utils/errorHandler');
 const log = require('../../utils/log')(module);
 
@@ -25,18 +22,18 @@ const AddUser = (teamIdString, userModel, teamModel, tournamentModel) => {
                 include: [
                     {
                         model: userModel,
-                        attributes: ['id']
+                        attributes: ['id'],
                     },
                     {
                         model: tournamentModel,
-                        attributes: ['playersPerTeam']
-                    }
-                ]
+                        attributes: ['playersPerTeam'],
+                    },
+                ],
             });
             const user = await userModel.findByPk(req.body.user, {
                 where: {
-                    askingTeamId: team.id
-                }
+                    askingTeamId: team.id,
+                },
             });
 
             if (team && team.users.length === team.tournament.playersPerTeam) {

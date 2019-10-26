@@ -1,5 +1,4 @@
 const errorHandler = require('../../utils/errorHandler');
-const isTeamPaid = require('../../utils/isTeamPaid');
 
 /**
  * GET /teams

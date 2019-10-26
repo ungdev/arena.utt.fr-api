@@ -1,6 +1,4 @@
 const errorHandler = require('../../utils/errorHandler');
-const isAuth = require('../../middlewares/isAuth');
-const isTeamPaid = require('../../utils/isTeamPaid');
 
 /**
  * GET /tournaments/:id
