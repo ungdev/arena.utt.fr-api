@@ -2,6 +2,7 @@ const isAuth = require('../../middlewares/isAuth');
 const errorHandler = require('../../utils/errorHandler');
 
 /**
+ * Delete a specified item from a specified cart
  * DELETE /carts/:cartId/cartItems/:id
  * {
  *
@@ -10,39 +11,38 @@ const errorHandler = require('../../utils/errorHandler');
  * {
  *
  * }
+ * @param {string} cartIdString the name of the cartId parameter in the url
+ * @param {string} itemIdString the name of the itemId parameter in the url
+ * @param {object} cartItemModel the cart model to query
  */
 
-module.exports = (app) => {
-  app.delete('/carts/:cartId/cartItems/:id', [isAuth()]);
+const DeleteItemFromCart = (cartIdString, itemIdString, cartItemModel) => {
+    return async (req, res) => {
+        const cartId = req.params[cartIdString];
+        const itemId = req.params[itemIdString];
+        try {
+            const cartItem = await cartItemModel.findOne({
+                where: {
+                    id: itemId,
+                    userId: req.user.id,
+                    cartId: cartId,
+                },
+            });
 
-  app.delete('/carts/:cartId/cartItems/:id', async (req, res) => {
-    const { CartItem } = req.app.locals.models;
+            if (!cartItem) {
+                return res
+                    .status(404)
+                    .json({ error: 'ITEM_NOT_FOUND' })
+                    .end();
+            }
 
-    try {
-      const cartItem = await CartItem.findOne({
-        where: {
-          id: req.params.id,
-          userId: req.user.id,
-          cartId: req.params.cartId,
-        },
-      });
+            await cartItem.destroy();
 
-      if (!cartItem) {
-        return res
-          .status(404)
-          .json({ error: 'ITEM_NOT_FOUND' })
-          .end();
-      }
-
-      await cartItem.destroy();
-
-      return res
-        .status(204)
-        .end();
-    }
-
-    catch (err) {
-      return errorHandler(err, res);
-    }
-  });
+            return res.status(204).end();
+        } catch (err) {
+            return errorHandler(err, res);
+        }
+    };
 };
+
+module.exports = DeleteItemFromCart;
