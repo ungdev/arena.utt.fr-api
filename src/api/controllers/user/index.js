@@ -5,7 +5,6 @@ const isAuth = require('../../middlewares/isAuth');
 const { Edit, CheckEdit } = require('./edit.js');
 const { List, CheckList } = require('./list.js');
 const Get = require('./get.js');
-const { Register, CheckRegister } = require('./register.js');
 const GetTicket = require('./getTicket.js');
 const GetUserCart = require('./getUserCart.js');
 const ListCartsFromUser = require('./list-carts.js');
@@ -37,7 +36,6 @@ const User = models => {
             models.CartItem
         )
     );
-    router.post('/', CheckRegister, Register(models.User));
     router.get(
         '/:userId/ticket',
         [isAuth()],

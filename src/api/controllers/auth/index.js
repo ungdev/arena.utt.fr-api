@@ -5,6 +5,7 @@ const validateBody = require('../../middlewares/validateBody');
 const ResetPassword = require('./reset-password.js');
 const Login = require('./login.js');
 const ChangePassword = require('./change-password.js');
+const { Register, CheckRegister } = require('./register.js');
 
 const loginCheck = [
     check('username').exists(),
@@ -38,6 +39,7 @@ const Auth = models => {
         changePasswordCheck,
         ChangePassword(models.User)
     );
+    router.post('/register', CheckRegister, Register(models.User));
     return router;
 };
 
