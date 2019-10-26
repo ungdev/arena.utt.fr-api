@@ -2,6 +2,7 @@ const Express = require('express');
 const { Create, CheckCreate } = require('./create.js');
 const List = require('./get.all.js');
 const GetByMac = require('./get.js');
+const { Edit, CheckEdit } = require('./put.js');
 
 const mac = 'mac';
 
@@ -13,6 +14,7 @@ const Network = models => {
         `/:${mac}`,
         GetByMac(mac, models.Network, models.User, models.Team)
     );
+    router.put(`/:${mac}`, CheckEdit, Edit(mac, models.Network));
     return router;
 };
 module.exports = Network;
