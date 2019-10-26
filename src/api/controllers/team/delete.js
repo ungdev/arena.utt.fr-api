@@ -9,6 +9,7 @@ const isType = require('../../middlewares/isType');
  * DELETE /teams/:id
  *
  * Response:
+ * @param {string} teamIdString the name of the id to look for in the route parameter
  */
 const Delete = teamIdString => {
     return async (req, res) => {

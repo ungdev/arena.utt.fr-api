@@ -16,6 +16,8 @@ const CheckAddItem = [
 ];
 
 /**
+ * Add an item to a user's cart.
+ *
  * POST /carts/:cartId/cartItems
  * {
  *  itemId: int
@@ -30,10 +32,10 @@ const CheckAddItem = [
  */
 const AddItemToCart = (cartIdString, cartItemModel, userModel, cartModel) => {
     return async (req, res) => {
-        const payForUser = req.body.forUserId || req.user.id;
+        const forUser = req.body.forUserId || req.user.id;
         const cartId = req.params[cartIdString];
         try {
-            const user = await userModel.findByPk(payForUser);
+            const user = await userModel.findByPk(forUser);
             if (!user) {
                 return res
                     .status(404)
@@ -59,7 +61,7 @@ const AddItemToCart = (cartIdString, cartItemModel, userModel, cartModel) => {
             const cartItem = {
                 ...req.body,
                 userId: req.user.id, // Attention ! Pas compatible avec admin
-                forUserId: payForUser,
+                forUserId: forUser,
                 cartId: cartId,
             };
 

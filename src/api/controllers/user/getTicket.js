@@ -1,7 +1,6 @@
 const { Op } = require('sequelize');
 
 const generateTicket = require('../../utils/generateTicket');
-const isAuth = require('../../middlewares/isAuth');
 const errorHandler = require('../../utils/errorHandler');
 
 const GetTicket = (userModel, cartItemModel, itemModel, cartModel) => {

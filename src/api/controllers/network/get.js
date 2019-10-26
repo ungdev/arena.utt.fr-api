@@ -5,6 +5,11 @@ const errorHandler = require('../../utils/errorHandler');
  *
  * Response:
  *
+ * @param {string} macStringName name of the parameter in the route
+ * @param {object} networkModel
+ * @param {object} userModel
+ * @param {object} teamModel
+ *
  */
 const GetByMac = (macStringName, networkModel, userModel, teamModel) => {
     return async (req, res) => {

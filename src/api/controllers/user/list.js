@@ -2,7 +2,6 @@ const { Op } = require('sequelize');
 const { check } = require('express-validator');
 
 const validateBody = require('../../middlewares/validateBody');
-const isAuth = require('../../middlewares/isAuth');
 const errorHandler = require('../../utils/errorHandler');
 
 const ITEM_PLAYER_ID = 1;
@@ -11,6 +10,7 @@ const ITEM_VISITOR_ID = 2;
 const CheckList = [check('email').isEmail(), validateBody()];
 
 /**
+ * Get the user list
  * GET /users
  * Query Params: {
  *    email: String
@@ -20,6 +20,11 @@ const CheckList = [check('email').isEmail(), validateBody()];
  * {
  *   [User]
  * }
+ * @param {object} userModel
+ * @param {object} teamModel
+ * @param {object} tournamentModel
+ * @param {object} cartModel
+ * @param {object} cartItemModel
  */
 const List = (
     userModel,

@@ -9,6 +9,7 @@ const ITEM_PLAYER_ID = 1;
 const ITEM_VISITOR_ID = 2;
 
 /**
+ * Authenticate a user based on his email/username and password
  * PUT /user/login
  * {
  *    username: String
@@ -20,6 +21,10 @@ const ITEM_VISITOR_ID = 2;
  *    user: User,
  *    token: String
  * }
+ * @param {object} userModel
+ * @param {object} teamModel
+ * @param {object} cartModel
+ * @param {object} cartItemModel
  */
 const Login = (userModel, teamModel, cartModel, cartItemModel) => {
     return async (req, res) => {

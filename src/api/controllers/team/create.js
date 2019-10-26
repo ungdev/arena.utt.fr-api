@@ -9,10 +9,12 @@ const log = require('../../utils/log')(module);
 const CheckCreate = [
     check('teamName').isLength({ min: 3, max: 40 }),
     check('tournament').isInt(),
-    validateBody()
+    validateBody(),
 ];
 
 /**
+ * Create a team
+ *
  * POST /team
  * {
  *    teamName: String
@@ -22,6 +24,10 @@ const CheckCreate = [
  * {
  *    team: Team
  * }
+ *
+ * @param {object} tournamentModel
+ * @param {object} teamModel
+ * @param {object} userModel
  */
 const Create = (tournamentModel, teamModel, userModel) => {
     return async (req, res) => {
@@ -32,9 +38,9 @@ const Create = (tournamentModel, teamModel, userModel) => {
                     include: [
                         {
                             model: teamModel,
-                            include: [userModel]
-                        }
-                    ]
+                            include: [userModel],
+                        },
+                    ],
                 }
             );
             const tournamentFull = await isTournamentFull(tournament, req);
@@ -47,7 +53,7 @@ const Create = (tournamentModel, teamModel, userModel) => {
 
             const team = await teamModel.create({
                 name: req.body.teamName,
-                tournamentId: req.body.tournament
+                tournamentId: req.body.tournament,
             });
             await team.addUser(req.user);
             await team.setCaptain(req.user);
@@ -59,7 +65,7 @@ const Create = (tournamentModel, teamModel, userModel) => {
                 firstname: req.user.firstname,
                 lastname: req.user.lastname,
                 username: req.user.username,
-                email: req.user.email
+                email: req.user.email,
             };
 
             log.info(
@@ -72,7 +78,7 @@ const Create = (tournamentModel, teamModel, userModel) => {
                     ...team.toJSON(),
                     tournament: tournament.toJSON(),
                     users: [outputUser],
-                    askingUsers: []
+                    askingUsers: [],
                 })
                 .end();
         } catch (err) {

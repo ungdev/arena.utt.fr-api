@@ -1,6 +1,8 @@
 const errorHandler = require('../../utils/errorHandler');
 
 /**
+ * Get all the teams that have join the current tournament
+ *
  * GET /tournaments/:id/teams
  *
  * Params: {
@@ -12,6 +14,9 @@ const errorHandler = require('../../utils/errorHandler');
  * [
  *  [Team]
  * ]
+ * @param {object} teamModel
+ * @param {object} userModel
+ * @param {object} tournamentModel
  */
 
 const GetTeamsFromTournaments = (teamModel, userModel, tournamentModel) => {

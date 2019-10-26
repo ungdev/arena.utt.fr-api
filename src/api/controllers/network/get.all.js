@@ -1,6 +1,7 @@
 const errorHandler = require('../../utils/errorHandler');
 
 /**
+ * List all the network registered inside the app
  * get /networks
  *
  * Response:

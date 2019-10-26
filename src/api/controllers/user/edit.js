@@ -1,7 +1,6 @@
 const bcrypt = require('bcryptjs');
 const { check } = require('express-validator');
 const validateBody = require('../../middlewares/validateBody');
-const isAuth = require('../../middlewares/isAuth');
 
 const errorHandler = require('../../utils/errorHandler');
 const log = require('../../utils/log')(module);
@@ -22,6 +21,8 @@ const ITEM_PLAYER_ID = 1;
 const ITEM_VISITOR_ID = 2;
 
 /**
+ * Edit the user's info
+ *
  * PUT /users/:id
  * {
  *   firstname: String
@@ -30,11 +31,13 @@ const ITEM_VISITOR_ID = 2;
  *   (password): String,
  *   (oldPassword): String
  * }
- *
  * Response
  * {
  *
  * }
+ *
+ * @param {object} cartModel
+ * @param {object} cartItemModel
  */
 const Edit = (cartModel, cartItemModel) => {
     return async (req, res) => {

@@ -4,6 +4,8 @@ const ITEM_PLAYER_ID = 1;
 const ITEM_VISITOR_ID = 2;
 
 /**
+ * Get a user based on its id
+ *
  * GET /users/:id
  * {
  *
@@ -13,8 +15,12 @@ const ITEM_VISITOR_ID = 2;
  * {
  *   User
  * }
+ *
+ * @param {object} userModel
+ * @param {object} teamModel
+ * @param {object} cartModel
+ * @param {object} cartItemModel
  */
-// todo: admin chekc
 const Get = (userModel, teamModel, cartModel, cartItemModel) => {
     return async (req, res) => {
         try {

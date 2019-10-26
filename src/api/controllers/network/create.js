@@ -12,7 +12,7 @@ const CheckCreate = [
 ];
 
 /**
- * Insert a new network in database
+ * Insert a new network in database, or update an existing one
  * POST /network
  *
  * Response:

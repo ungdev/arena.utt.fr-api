@@ -1,6 +1,8 @@
 const errorHandler = require('../../utils/errorHandler');
 
 /**
+ * Get a tournament specified by its id
+ *
  * GET /tournaments/:id
  *
  * Params: {
@@ -9,6 +11,10 @@ const errorHandler = require('../../utils/errorHandler');
  *
  * Response:
  * [Tournament]
+ *
+ * @param {object} tournamentModel
+ * @param {object} teamModel
+ * @param {object} userModel
  */
 
 const Get = (tournamentModel, teamModel, userModel) => {

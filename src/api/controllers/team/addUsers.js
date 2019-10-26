@@ -5,6 +5,8 @@ const log = require('../../utils/log')(module);
 
 const CheckAddUser = [check('user').isUUID(), validateBody()];
 /**
+ * Add a user to a specified team
+ *
  * POST /teams/:id/users
  * {
  *   user: UUID
@@ -14,6 +16,11 @@ const CheckAddUser = [check('user').isUUID(), validateBody()];
  * {
  *
  * }
+ * @param {string} teamIdString the team id name to look for in the route parameters
+ * @param {object} userModel the user model to query
+ * @param {object} teamModel the team model to query
+ * @param {object} tournamentModel the tournament model to query
+ *
  */
 const AddUser = (teamIdString, userModel, teamModel, tournamentModel) => {
     return async (req, res) => {

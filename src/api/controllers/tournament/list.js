@@ -1,6 +1,8 @@
 const errorHandler = require('../../utils/errorHandler');
 
 /**
+ * Get all the tournaments
+ *
  * GET /tournaments
  *
  * Params: {
@@ -12,6 +14,10 @@ const errorHandler = require('../../utils/errorHandler');
  * [
  *   [Tournament]
  * ]
+ *
+ * @param {object} tournamentModel
+ * @param {object} teamModel
+ * @param {object} userModel
  */
 const List = (tournamentModel, teamModel, userModel) => {
     return async (req, res) => {

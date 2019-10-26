@@ -5,6 +5,8 @@ const log = require('../../utils/log')(module);
 //const sendMail = require('../../mail/reset');
 
 /**
+ * Ask for a password reset. It will generate a reset token
+ * which have to be used with the `change-password` route
  * POST /auth/reset
  * {
  *    email: String
@@ -20,6 +22,7 @@ const log = require('../../utils/log')(module);
  *    token: String,
  *    password: String
  * }
+ * @param {object} userModel
  */
 const ResetPassword = userModel => async (req, res) => {
     const { email } = req.body;
@@ -40,10 +43,10 @@ const ResetPassword = userModel => async (req, res) => {
             resetToken: uuid(),
         });
 
-        // await sendMail(user.email, {
-        //  username: user.username,
-        //  link: `${process.env.ARENA_WEBSITE}}/password/change/${user.resetToken}`
-        // });
+        await sendMail(user.email, {
+            username: user.username,
+            link: `${process.env.ARENA_WEBSITE}}/password/change/${user.resetToken}`,
+        });
 
         log.info(`user ${user.username} asked for mail reset`);
 
