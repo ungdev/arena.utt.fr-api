@@ -1,11 +1,9 @@
-const { check } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { Op } = require('sequelize');
 
 const log = require('../../utils/log')(module);
 const errorHandler = require('../../utils/errorHandler');
-const validateBody = require('../../middlewares/validateBody');
 
 const ITEM_PLAYER_ID = 1;
 const ITEM_VISITOR_ID = 2;
