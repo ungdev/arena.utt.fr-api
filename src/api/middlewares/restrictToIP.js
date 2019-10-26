@@ -33,7 +33,6 @@ const isIpOkay = (ipToTest, listOfIp) => {
 const RestrictToIP = authorizedIpAddress => {
     return async (request, response, next) => {
         const ipArray = getIpArray(authorizedIpAddress);
-        const ipOkay = ipArray.filter(ip => ip === request.ip);
         if (isIpOkay(request.ip, ipArray)) {
             next();
         } else {
