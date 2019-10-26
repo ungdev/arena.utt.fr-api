@@ -1,8 +1,19 @@
 const { check } = require('express-validator');
 
-const isAuth = require('../../middlewares/isAuth');
 const errorHandler = require('../../utils/errorHandler');
 const validateBody = require('../../middlewares/validateBody');
+
+const CheckAddItem = [
+    check('itemId').isInt(),
+    check('quantity').isInt(),
+    check('attributeId')
+        .optional()
+        .isInt(),
+    check('forUserId')
+        .optional()
+        .isUUID(),
+    validateBody(),
+];
 
 /**
  * POST /carts/:cartId/cartItems
@@ -17,72 +28,53 @@ const validateBody = require('../../middlewares/validateBody');
  *
  * }
  */
-module.exports = (app) => {
-  app.post('/carts/:cartId/cartItems', [isAuth()]);
+const AddItemToCart = (cartIdString, cartItemModel, userModel, cartModel) => {
+    return async (req, res) => {
+        const payForUser = req.body.forUserId || req.user.id;
+        const cartId = req.params[cartIdString];
+        try {
+            const user = await userModel.findByPk(payForUser);
+            if (!user) {
+                return res
+                    .status(404)
+                    .json({ error: 'USER_NOT_FOUND' })
+                    .end();
+            }
+            // A modifier après pour l'admin
+            const cartCount = await cartModel.count({
+                where: {
+                    id: req.params.cartId,
+                    userId: req.user.id,
+                    transactionState: 'draft',
+                },
+            });
 
-  app.post('/carts/:cartId/cartItems', [
-    check('itemId')
-      .isInt(),
-    check('quantity')
-      .isInt(),
-    check('attributeId')
-      .optional()
-      .isInt(),
-    check('forUserId')
-      .optional()
-      .isUUID(),
-    validateBody(),
-  ]);
+            if (cartCount !== 1) {
+                return res
+                    .status(400)
+                    .json({ error: 'BAD_REQUEST' })
+                    .end();
+            }
 
-  app.post('/carts/:cartId/cartItems', async (req, res) => {
-    const { CartItem, User, Cart } = req.app.locals.models;
+            const cartItem = {
+                ...req.body,
+                userId: req.user.id, // Attention ! Pas compatible avec admin
+                forUserId: payForUser,
+                cartId: cartId,
+            };
 
-    try {
-      if (req.body.forUserId) {
-        const user = await User.findByPk(req.body.forUserId);
-        if (!user) {
-          return res
-            .status(404)
-            .json({ error: 'USER_NOT_FOUND' })
-            .end();
+            // Attention: pas de verification d'attribute si ça peut correspondre à un itemId
+            // Est-ce utile ?
+            const newCartItem = await cartItemModel.create(cartItem);
+
+            return res
+                .status(200)
+                .json(newCartItem)
+                .end();
+        } catch (err) {
+            return errorHandler(err, res);
         }
-      }
-      else {
-        req.body.forUserId = req.user.id;
-      }
-      // A modifier après pour l'admin
-      const cartCount = await Cart.count({
-        where: {
-          id: req.params.cartId,
-          userId: req.user.id,
-          transactionState: 'draft',
-        },
-      });
-
-      if (cartCount !== 1) {
-        return res
-          .status(400)
-          .json({ error: 'BAD_REQUEST' })
-          .end();
-      }
-
-      const cartItem = {
-        ...req.body,
-        userId: req.user.id, // Attention ! Pas compatible avec admin
-        cartId: req.params.cartId,
-      };
-
-      // Attention: pas de verification d'attribute si ça peut correspondre à un itemId
-      // Est-ce utile ?
-      const newCartItem = await CartItem.create(cartItem);
-
-      return res
-        .status(200)
-        .json(newCartItem)
-        .end();
-    }
-    catch (err) {
-      return errorHandler(err, res);
-    }
-  });
+    };
 };
+
+module.exports = { AddItemToCart, CheckAddItem };
