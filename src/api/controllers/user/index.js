@@ -8,6 +8,7 @@ const Get = require('./get.js');
 const { Register, CheckRegister } = require('./register.js');
 const GetTicket = require('./getTicket.js');
 const GetUserCart = require('./getUserCart.js');
+const ListCartsFromUser = require('./list-carts.js');
 
 const userId = 'userId';
 
@@ -50,6 +51,17 @@ const User = models => {
             models.CartItem,
             models.Attribute,
             models.User
+        )
+    );
+    router.get(
+        `/:${userId}/carts`,
+        [isAuth()],
+        ListCartsFromUser(
+            userId,
+            models.Cart,
+            models.Item,
+            models.CartItem,
+            models.Attribute
         )
     );
     return router;
