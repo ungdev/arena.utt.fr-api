@@ -54,10 +54,10 @@ const ResetPassword = userModel => async (req, res) => {
             resetToken: uuid(),
         });
 
-        //await sendMail(user.email, {
-        //    username: user.username,
-        //    link: `${process.env.ARENA_WEBSITE}}/password/change/${user.resetToken}`,
-        //});
+        await sendMail(user.email, {
+            username: user.username,
+            link: `${process.env.ARENA_WEBSITE}}/password/change/${user.resetToken}`,
+        });
 
         log.info(`user ${user.username} asked for mail reset`);
 
