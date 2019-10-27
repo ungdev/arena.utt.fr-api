@@ -5,6 +5,16 @@ const log = require('../../utils/log')(module);
 const { sendMail } = require('../../mail');
 //const sendMail = require('../../mail/reset');
 
+const { check } = require('express-validator');
+const validateBody = require('../../middlewares/validateBody');
+
+const CheckReset = [
+    check('email')
+        .isEmail()
+        .exists(),
+    validateBody(),
+];
+
 /**
  * Ask for a password reset. It will generate a reset token
  * which have to be used with the `change-password` route
@@ -57,4 +67,4 @@ const ResetPassword = userModel => async (req, res) => {
     }
 };
 
-module.exports = ResetPassword;
+module.exports = { ResetPassword, CheckReset };
