@@ -3,15 +3,9 @@ const { check } = require('express-validator');
 const validateBody = require('../../middlewares/validateBody');
 
 const ResetPassword = require('./reset-password.js');
-const Login = require('./login.js');
+const { Login, CheckLogin } = require('./login.js');
 const { ChangePassword, CheckChangePassword } = require('./change-password.js');
 const { Register, CheckRegister } = require('./register.js');
-
-const loginCheck = [
-    check('username').exists(),
-    check('password').exists(),
-    validateBody(),
-];
 
 const resetCheck = [
     check('email')
@@ -24,7 +18,7 @@ const Auth = models => {
     router = Express.Router();
     router.post(
         '/login',
-        loginCheck,
+        CheckLogin,
         Login(models.User, models.Team, models.Cart, models.CartItem)
     );
     router.post('/password/reset', resetCheck, ResetPassword(models.User));

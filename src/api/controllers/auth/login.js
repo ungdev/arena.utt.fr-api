@@ -1,12 +1,19 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { Op } = require('sequelize');
-
 const log = require('../../utils/log')(module);
 const errorHandler = require('../../utils/errorHandler');
+const { check } = require('express-validator');
+const validateBody = require('../../middlewares/validateBody');
 
 const ITEM_PLAYER_ID = 1;
 const ITEM_VISITOR_ID = 2;
+
+const CheckLogin = [
+    check('username').exists(),
+    check('password').exists(),
+    validateBody(),
+];
 
 /**
  * Authenticate a user based on his email/username and password
@@ -128,4 +135,4 @@ const Login = (userModel, teamModel, cartModel, cartItemModel) => {
     };
 };
 
-module.exports = Login;
+module.exports = { Login, CheckLogin };
