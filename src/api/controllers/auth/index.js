@@ -4,7 +4,7 @@ const validateBody = require('../../middlewares/validateBody');
 
 const ResetPassword = require('./reset-password.js');
 const Login = require('./login.js');
-const ChangePassword = require('./change-password.js');
+const { ChangePassword, CheckChangePassword } = require('./change-password.js');
 const { Register, CheckRegister } = require('./register.js');
 
 const loginCheck = [
@@ -20,12 +20,6 @@ const resetCheck = [
     validateBody(),
 ];
 
-const changePasswordCheck = [
-    check('password').isLength({ min: 6 }),
-    check('resetToken').isUUID(),
-    validateBody(),
-];
-
 const Auth = models => {
     router = Express.Router();
     router.post(
@@ -36,7 +30,7 @@ const Auth = models => {
     router.post('/password/reset', resetCheck, ResetPassword(models.User));
     router.put(
         '/password/update',
-        changePasswordCheck,
+        CheckChangePassword,
         ChangePassword(models.User)
     );
     router.post('/register', CheckRegister, Register(models.User));

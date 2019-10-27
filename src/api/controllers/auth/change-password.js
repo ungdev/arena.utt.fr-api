@@ -1,6 +1,14 @@
 const bcrypt = require('bcryptjs');
 const errorHandler = require('../../utils/errorHandler');
 const log = require('../../utils/log')(module);
+const { check } = require('express-validator');
+const validateBody = require('../../middlewares/validateBody');
+
+const CheckChangePassword = [
+    check('password').isLength({ min: 6 }),
+    check('resetToken').isUUID(),
+    validateBody(),
+];
 
 /**
  * Execute a password update for a user, using a reset token provided
@@ -39,4 +47,4 @@ const ChangePassword = userModel => async (request, response) => {
     }
 };
 
-module.exports = ChangePassword;
+module.exports = { ChangePassword, CheckChangePassword };
