@@ -14,7 +14,11 @@ const cartId = 'cartId';
 
 const User = models => {
   const router = Express.Router();
-  router.put('/:userId', [CheckEdit], Edit(models.Cart, models.ItemModel));
+  router.put(
+    `/:${userId}`,
+    CheckEdit,
+    Edit(userId, models.Cart, models.CartItem)
+  );
   router.get(
     '/:userId',
     Get(models.User, models.Team, models.Cart, models.CartItem)
