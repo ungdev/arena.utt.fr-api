@@ -20,8 +20,8 @@ const User = models => {
     Edit(userId, models.Cart, models.CartItem)
   );
   router.get(
-    '/:userId',
-    Get(models.User, models.Team, models.Cart, models.CartItem)
+    `/:${userId}`,
+    Get(userId, models.User, models.Team, models.Cart, models.CartItem)
   );
   router.get(
     '/',
