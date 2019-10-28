@@ -41,7 +41,7 @@ const Cart = models => {
     )
   );
   router.get('/return', etupay.middleware, SuccessfulPayment());
-  router.get('/callback', EtupayAvailable());
+  router.post('/callback', EtupayAvailable());
   return router;
 };
 
