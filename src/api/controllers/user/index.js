@@ -1,7 +1,5 @@
 const Express = require('express');
 
-const isAuth = require('../../middlewares/isAuth');
-
 const { Edit, CheckEdit } = require('./edit.js');
 const { List, CheckList } = require('./list.js');
 const Get = require('./get.js');
