@@ -34,6 +34,7 @@ const Get = (userIdString, userModel, teamModel, cartModel, cartItemModel) => as
         'email',
         'askingTeamId',
         'type',
+        'permissions',
       ],
       include: {
         model: teamModel,

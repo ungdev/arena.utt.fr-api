@@ -100,9 +100,9 @@ const Login = (userModel, teamModel, cartModel, cartItemModel) => async (req, re
           model: cartItemModel,
           where: {
             itemId:
-                                user.type === 'visitor'
-                                  ? ITEM_VISITOR_ID
-                                  : ITEM_PLAYER_ID,
+              user.type === 'visitor'
+                ? ITEM_VISITOR_ID
+                : ITEM_PLAYER_ID,
             forUserId: user.id,
           },
         },
@@ -123,6 +123,7 @@ const Login = (userModel, teamModel, cartModel, cartItemModel) => async (req, re
           email: user.email,
           team: user.team,
           type: user.type,
+          permissions: user.permissions,
           isPaid,
         },
         token,
