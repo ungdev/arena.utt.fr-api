@@ -12,6 +12,7 @@ const Item = require('./items');
 const Entry = require('./entry');
 const Info = require('./info');
 const Network = require('./network');
+const Admin = require('./admin');
 
 const MainRoutes = (models) => {
   const mainRouter = Express.Router();
@@ -28,6 +29,7 @@ const MainRoutes = (models) => {
     resttrictToIp(['::1', 'awdawdawd']),
     Network(models),
   );
+  mainRouter.use('/admin', [isAuth()], Admin(models));
   return mainRouter;
 };
 
