@@ -1,4 +1,5 @@
 const errorHandler = require('../../utils/errorHandler');
+const hasTeamPaid = require('../../utils/hasTeamPaid');
 
 /**
  * Get all the teams registered
@@ -34,7 +35,7 @@ const List = (teamModel, tournamentModel, userModel) => async (req, res) => {
       teams.map(async (team) => {
         let isPaid = true;
         if (req.query.paidOnly === 'true') {
-          isPaid = await isTeamPaid(req, team, tournaments);
+          isPaid = await hasTeamPaid(req, team, tournaments);
         }
         return isPaid
           ? {

@@ -1,4 +1,5 @@
 const errorHandler = require('../../utils/errorHandler');
+const hasTeamPaid = require('../../utils/hasTeamPaid');
 
 /**
  * Get all the teams that have join the current tournament
@@ -50,7 +51,7 @@ const GetTeamsFromTournaments = (teamModel, userModel, tournamentModel) => async
           tournament: undefined,
         };
         if (req.query.paidOnly === 'true') {
-          const isPaid = await isTeamPaid(
+          const isPaid = await hasTeamPaid(
             req,
             team,
             null,

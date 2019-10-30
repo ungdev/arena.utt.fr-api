@@ -1,4 +1,5 @@
 const errorHandler = require('../../utils/errorHandler');
+const hasTeamPaid = require('../../utils/hasTeamPaid');
 
 /**
  * Get a tournament specified by its id
@@ -39,7 +40,7 @@ const Get = (tournamentModel, teamModel, userModel) => async (req, res) => {
       tournament.teams.map(async (team) => {
         let isPaid = true;
         if (req.query.paidOnly === 'true') {
-          isPaid = await isTeamPaid(
+          isPaid = await hasTeamPaid(
             req,
             team,
             null,
