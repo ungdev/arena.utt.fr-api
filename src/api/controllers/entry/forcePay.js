@@ -7,14 +7,14 @@ const ITEM_VISITOR_ID = 2;
 /**
  * Get a user based on its id
  *
- * GET /entry/user
+ * POST /entry/forcePay/:userId
  * {
  *
  * }
  *
  * Response
  * {
- *   User
+ *
  * }
  *
  * @param {string} userIdString
@@ -22,15 +22,15 @@ const ITEM_VISITOR_ID = 2;
  * @param {object} CartModel
  * @param {object} CartItemModel
  */
-const ForcePay = (userIdString, userModel, cartModel, cartItemModel) => async (req, res) => {
+const ForcePay = (userIdString, userModel, cartModel, cartItemModel) => async (request, response) => {
   try {
-    const userId = req.params[userIdString];
+    const userId = request.params[userIdString];
 
     const user = await userModel.findByPk(userId);
     const itemId = user.type === 'player' ? ITEM_PLAYER_ID : ITEM_VISITOR_ID;
 
     if (!user) {
-      return res
+      return response
         .status(404)
         .json({ error: 'NOT_FOUND' })
         .end();
@@ -50,12 +50,12 @@ const ForcePay = (userIdString, userModel, cartModel, cartItemModel) => async (r
       quantity: 1,
     });
 
-    return res
+    return response
       .status(204)
       .end();
   }
   catch (error) {
-    return errorHandler(error, res);
+    return errorHandler(error, response);
   }
 };
 

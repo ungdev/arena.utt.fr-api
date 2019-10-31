@@ -1,9 +1,6 @@
-const { Op } = require('sequelize');
-
 const errorHandler = require('../../utils/errorHandler');
-
-const ITEM_PLAYER_ID = 1;
-const ITEM_VISITOR_ID = 2;
+const hasCartPaid = require('../../utils/hasCartPaid');
+const querySearch = require('../../utils/querySearch');
 
 /**
  * Get a user based on its id
@@ -24,35 +21,14 @@ const ITEM_VISITOR_ID = 2;
  * @param {object} cartModel
  * @param {object} cartItemModel
  */
-const Scan = (userModel, teamModel, tournamentModel, cartModel, cartItemModel) => async (req, res) => {
+const Scan = (userModel, teamModel, tournamentModel, cartModel, cartItemModel) => async (request, response) => {
   try {
-    const { barcode, search } = req.query;
+    const { barcode, search } = request.query;
     const users = await userModel.findAll({
       where: barcode
         ? { barcode }
         : {
-          [Op.or]: [
-            {
-              email: {
-                [Op.like]: `%${search}%`,
-              },
-            },
-            {
-              username: {
-                [Op.like]: `%${search}%`,
-              },
-            },
-            {
-              firstname: {
-                [Op.like]: `%${search}%`,
-              },
-            },
-            {
-              lastname: {
-                [Op.like]: `%${search}%`,
-              },
-            },
-          ],
+          ...querySearch(search),
         },
       include: {
         model: teamModel,
@@ -65,7 +41,7 @@ const Scan = (userModel, teamModel, tournamentModel, cartModel, cartItemModel) =
     });
 
     if (users.length > 1) {
-      return res
+      return response
         .status(404)
         .json({ error: 'NOT_FOUND' })
         .end();
@@ -74,31 +50,15 @@ const Scan = (userModel, teamModel, tournamentModel, cartModel, cartItemModel) =
     const user = users[0];
 
     if (user.scanned) {
-      return res
+      return response
         .status(403)
         .json({ error: 'ALREADY_SCANNED' })
         .end();
     }
-
-    const hasCartPaid = await cartModel.count({
-      where: {
-        transactionState: 'paid',
-      },
-      include: [
-        {
-          model: cartItemModel,
-          where: {
-            itemId:
-                user.type === 'visitor' ? ITEM_VISITOR_ID : ITEM_PLAYER_ID,
-            forUserId: user.id,
-          },
-        },
-      ],
-    });
-    const isPaid = !!hasCartPaid;
+    const isPaid = await hasCartPaid(user, cartModel, cartItemModel);
 
     if (!isPaid) {
-      return res
+      return response
         .status(403)
         .json({ error: 'NOT_PAID' })
         .end();
@@ -106,13 +66,13 @@ const Scan = (userModel, teamModel, tournamentModel, cartModel, cartItemModel) =
 
     await user.update({ scanned: true });
 
-    return res
+    return response
       .status(200)
       .json(user)
       .end();
   }
   catch (error) {
-    return errorHandler(error, res);
+    return errorHandler(error, response);
   }
 };
 
