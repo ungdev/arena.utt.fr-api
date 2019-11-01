@@ -1,6 +1,5 @@
-const { Op } = require('sequelize');
-
 const errorHandler = require('../../utils/errorHandler');
+const querySearch = require('../../utils/querySearch');
 
 /**
  * Get a user based on its id
@@ -19,34 +18,11 @@ const errorHandler = require('../../utils/errorHandler');
  * @param {object} teamModel
  * @param {object} tournamentModel
  */
-const Search = (userModel, teamModel, tournamentModel) => async (req, res) => {
+const Search = (userModel, teamModel, tournamentModel) => async (request, response) => {
   try {
-    const { search } = req.query;
+    const { search } = request.query;
     const users = await userModel.findAll({
-      where: {
-        [Op.or]: [
-          {
-            email: {
-              [Op.like]: `%${search}%`,
-            },
-          },
-          {
-            username: {
-              [Op.like]: `%${search}%`,
-            },
-          },
-          {
-            firstname: {
-              [Op.like]: `%${search}%`,
-            },
-          },
-          {
-            lastname: {
-              [Op.like]: `%${search}%`,
-            },
-          },
-        ],
-      },
+      where: querySearch(search),
       include: {
         model: teamModel,
         attributes: ['id', 'name'],
@@ -58,7 +34,7 @@ const Search = (userModel, teamModel, tournamentModel) => async (req, res) => {
     });
 
     if (users.length > 1) {
-      return res
+      return response
         .status(404)
         .json({ error: 'NOT_FOUND' })
         .end();
@@ -66,13 +42,13 @@ const Search = (userModel, teamModel, tournamentModel) => async (req, res) => {
 
     const user = users[0];
 
-    return res
+    return response
       .status(200)
       .json(user)
       .end();
   }
   catch (error) {
-    return errorHandler(error, res);
+    return errorHandler(error, response);
   }
 };
 
