@@ -20,7 +20,7 @@ const Delete = (infoIdString, infoModel) => async (request, response) => {
     });
 
     return response
-      .status(200)
+      .status(204)
       .end();
   }
   catch (error) {

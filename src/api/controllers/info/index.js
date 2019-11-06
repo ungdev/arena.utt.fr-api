@@ -12,12 +12,13 @@ const Info = (models) => {
   router.get('/', List(models.Info));
   router.post(
     '/',
-    [hasPermission('anim'), CheckCreate],
+    hasPermission('anim'),
+    CheckCreate,
     Create(models.Info),
   );
   router.delete(
     `/:${infoId}`,
-    [hasPermission('anim')],
+    hasPermission('anim'),
     Delete(infoId, models.Info),
   );
   return router;
