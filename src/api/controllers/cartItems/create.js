@@ -5,6 +5,7 @@ const isAuth = require('../../middlewares/isAuth');
 const errorHandler = require('../../utils/errorHandler');
 const validateBody = require('../../middlewares/validateBody');
 const { isTournamentFull } = require('../../utils/isFull');
+const tshirtStocks = require('../../utils/tshirtStocks');
 
 /**
  * POST /carts/:cartId/cartItems
@@ -21,6 +22,8 @@ const { isTournamentFull } = require('../../utils/isFull');
  */
 const ITEM_PLAYER_ID = 1;
 const ITEM_VISITOR_ID = 2;
+const ITEM_SHIRT_MALE_ID = 6;
+const ITEM_SHIRT_FEMALE_ID = 7;
 
 module.exports = function createCartItem(app) {
   app.post('/carts/:cartId/cartItems', [isAuth()]);
@@ -50,7 +53,7 @@ module.exports = function createCartItem(app) {
             .end();
         }
       }
- else {
+      else {
         req.body.forUserId = req.user.id;
       }
       // A modifier après pour l'admin
@@ -128,10 +131,41 @@ module.exports = function createCartItem(app) {
           ],
         });
 
-        if (maxVisitors <= actualVisitors) {
+        if (maxVisitors < actualVisitors + req.body.quantity) {
           return res
             .status(400)
             .json({ error: 'VISITOR_FULL' })
+            .end();
+        }
+      }
+
+      if (itemId === ITEM_SHIRT_MALE_ID || itemId === ITEM_SHIRT_FEMALE_ID) {
+        const maxTShirt = tshirtStocks.find(
+          (stock) => stock.attributeId === req.body.attributeId && stock.itemId === req.body.itemId,
+        ).stock;
+
+        const actualTShirt = await CartItem.sum('quantity', {
+          where: {
+            itemId,
+            attributeId: req.body.attributeId,
+          },
+          include: [
+            {
+              model: Cart,
+              attributes: [],
+              where: {
+                transactionState: {
+                  [Op.in]: ['paid', 'draft'],
+                },
+              },
+            },
+          ],
+        });
+
+        if (maxTShirt < actualTShirt + req.body.quantity) {
+          return res
+            .status(400)
+            .json({ error: 'TSHIRT_FULL' })
             .end();
         }
       }
@@ -143,7 +177,7 @@ module.exports = function createCartItem(app) {
         .json(newCartItem)
         .end();
     }
- catch (err) {
+    catch (err) {
       return errorHandler(err, res);
     }
   });
