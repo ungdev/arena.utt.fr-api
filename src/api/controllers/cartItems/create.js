@@ -26,10 +26,8 @@ module.exports = function createCartItem(app) {
   app.post('/carts/:cartId/cartItems', [isAuth()]);
 
   app.post('/carts/:cartId/cartItems', [
-    check('itemId')
-      .isInt(),
-    check('quantity')
-      .isInt(),
+    check('itemId').isInt(),
+    check('quantity').isInt(),
     check('attributeId')
       .optional()
       .isInt(),
@@ -52,7 +50,7 @@ module.exports = function createCartItem(app) {
             .end();
         }
       }
-      else {
+ else {
         req.body.forUserId = req.user.id;
       }
       // A modifier après pour l'admin
@@ -81,16 +79,22 @@ module.exports = function createCartItem(app) {
       // Est-ce utile ?
       if (req.body.itemId === ITEM_PLAYER_ID) {
         const forUser = await User.findByPk(req.body.forUserId, {
-          include: [{
-            model: Team,
-            include: [{
-              model: Tournament,
-              include: [{
-                model: Team,
-                include: [User],
-              }],
-            }],
-          }],
+          include: [
+            {
+              model: Team,
+              include: [
+                {
+                  model: Tournament,
+                  include: [
+                    {
+                      model: Team,
+                      include: [User],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
         });
         const isFull = await isTournamentFull(forUser.team.tournament, req);
         if (isFull) {
@@ -101,7 +105,8 @@ module.exports = function createCartItem(app) {
         }
       }
 
-      if (req.body.itemId === ITEM_VISITOR_ID) {
+      const itemId = parseInt(req.body.itemId);
+      if (itemId === ITEM_VISITOR_ID) {
         const visitorItem = await Item.findByPk(ITEM_VISITOR_ID);
 
         const maxVisitors = visitorItem.stock;
@@ -110,15 +115,17 @@ module.exports = function createCartItem(app) {
           where: {
             itemId: ITEM_VISITOR_ID,
           },
-          include: [{
-            model: Cart,
-            attributes: [],
-            where: {
-              transactionState: {
-                [Op.in]: ['paid', 'draft'],
+          include: [
+            {
+              model: Cart,
+              attributes: [],
+              where: {
+                transactionState: {
+                  [Op.in]: ['paid', 'draft'],
+                },
               },
             },
-          }],
+          ],
         });
 
         if (maxVisitors <= actualVisitors) {
@@ -136,7 +143,7 @@ module.exports = function createCartItem(app) {
         .json(newCartItem)
         .end();
     }
-    catch (err) {
+ catch (err) {
       return errorHandler(err, res);
     }
   });
