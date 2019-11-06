@@ -26,11 +26,15 @@ const Create = (infoModel) => async (request, response) => {
   try {
     const info = await infoModel.create({
       ...request.body,
+      userId: request.user.id,
     });
 
     return response
       .status(201)
-      .json(info)
+      .json({
+        ...info.toJSON(),
+        user: { firstname: request.user.firstname, lastname: request.user.lastname },
+      })
       .end();
   }
   catch (error) {

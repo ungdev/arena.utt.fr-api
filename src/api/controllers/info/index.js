@@ -9,7 +9,7 @@ const infoId = 'infoId';
 
 const Info = (models) => {
   const router = Express.Router();
-  router.get('/', List(models.Info));
+  router.get('/', List(models.Info, models.User));
   router.post(
     '/',
     hasPermission('anim'),
