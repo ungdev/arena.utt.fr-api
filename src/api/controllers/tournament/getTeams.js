@@ -1,5 +1,5 @@
 const errorHandler = require('../../utils/errorHandler');
-const hasTeamPaid = require('../../utils/hasTeamPaid');
+const hasTeamPaid = require('../../utils/hasTeamPaid.js');
 
 /**
  * Get all the teams that have join the current tournament
@@ -20,7 +20,11 @@ const hasTeamPaid = require('../../utils/hasTeamPaid');
  * @param {object} tournamentModel
  */
 
-const GetTeamsFromTournaments = (teamModel, userModel, tournamentModel) => async (req, res) => {
+const GetTeamsFromTournaments = (
+  teamModel,
+  userModel,
+  tournamentModel,
+) => async (req, res) => {
   try {
     let teams = await teamModel.findAll({
       where: {
@@ -41,13 +45,11 @@ const GetTeamsFromTournaments = (teamModel, userModel, tournamentModel) => async
       teams.map(async (team) => {
         const teamFormat = {
           ...team.toJSON(),
-          users: team.users.map(
-            ({ username, firstname, lastname }) => ({
-              username,
-              firstname,
-              lastname,
-            }),
-          ),
+          users: team.users.map(({ username, firstname, lastname }) => ({
+            username,
+            firstname,
+            lastname,
+          })),
           tournament: undefined,
         };
         if (req.query.paidOnly === 'true') {
