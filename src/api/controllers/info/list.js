@@ -11,17 +11,22 @@ const errorHandler = require('../../utils/errorHandler');
  * }
  * @param {object} infoModel model to query Infos
  */
-const List = (infoModel) => async (req, res) => {
+const List = (infoModel, userModel) => async (request, response) => {
   try {
-    const infos = await infoModel.findAll();
+    const infos = await infoModel.findAll({
+      include: [{
+        model: userModel,
+        attributes: ['firstname', 'lastname'],
+      }],
+    });
 
-    return res
+    return response
       .status(200)
       .json(infos)
       .end();
   }
   catch (error) {
-    return errorHandler(error, res);
+    return errorHandler(error, response);
   }
 };
 

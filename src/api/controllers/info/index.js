@@ -9,15 +9,16 @@ const infoId = 'infoId';
 
 const Info = (models) => {
   const router = Express.Router();
-  router.get('/', List(models.Info));
+  router.get('/', List(models.Info, models.User));
   router.post(
     '/',
-    [hasPermission('anim'), CheckCreate],
+    hasPermission('anim'),
+    CheckCreate,
     Create(models.Info),
   );
   router.delete(
     `/:${infoId}`,
-    [hasPermission('anim')],
+    hasPermission('anim'),
     Delete(infoId, models.Info),
   );
   return router;

@@ -22,19 +22,23 @@ const CheckCreate = [
  * }
  * @param {object} infoModel model to query Infos
  */
-const Create = (infoModel) => async (req, res) => {
+const Create = (infoModel) => async (request, response) => {
   try {
     const info = await infoModel.create({
-      ...req.body,
+      ...request.body,
+      userId: request.user.id,
     });
 
-    return res
+    return response
       .status(201)
-      .json(info)
+      .json({
+        ...info.toJSON(),
+        user: { firstname: request.user.firstname, lastname: request.user.lastname },
+      })
       .end();
   }
   catch (error) {
-    return errorHandler(error, res);
+    return errorHandler(error, response);
   }
 };
 

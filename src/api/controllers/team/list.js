@@ -1,5 +1,5 @@
 const errorHandler = require('../../utils/errorHandler');
-const hasTeamPaid = require('../../utils/hasTeamPaid');
+const hasTeamPaid = require('../../utils/hasTeamPaid.js');
 
 /**
  * Get all the teams registered

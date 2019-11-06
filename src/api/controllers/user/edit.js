@@ -4,11 +4,14 @@ const validateBody = require('../../middlewares/validateBody');
 
 const errorHandler = require('../../utils/errorHandler');
 const log = require('../../utils/log')(module);
+const hasCartPaid = require('../../utils/hasCartPaid');
 
 const CheckEdit = [
   check('username').isLength({ min: 3, max: 100 }),
   check('lastname').isLength({ min: 2, max: 100 }),
   check('firstname').isLength({ min: 2, max: 100 }),
+  check('type')
+    .optional(),
   check('oldpassword')
     .optional()
     .isLength({ min: 6 }),
@@ -17,8 +20,6 @@ const CheckEdit = [
     .isLength({ min: 6 }),
   validateBody(),
 ];
-const ITEM_PLAYER_ID = 1;
-const ITEM_VISITOR_ID = 2;
 
 /**
  * Edit the user's info
@@ -80,24 +81,7 @@ const Edit = (userIdString, cartModel, cartItemModel) => async (req, res) => {
     let { type } = req.user;
 
     if (req.body.type) {
-      const hasCartPaid = await cartModel.count({
-        where: {
-          transactionState: 'paid',
-        },
-        include: [
-          {
-            model: cartItemModel,
-            where: {
-              itemId:
-                  req.user.type === 'visitor'
-                    ? ITEM_VISITOR_ID
-                    : ITEM_PLAYER_ID,
-              forUserId: req.user.id,
-            },
-          },
-        ],
-      });
-      const isPaid = !!hasCartPaid;
+      const isPaid = await hasCartPaid(req.user, cartModel, cartItemModel);
 
       if (!isPaid) {
         // Allow to change type only if user has not paid

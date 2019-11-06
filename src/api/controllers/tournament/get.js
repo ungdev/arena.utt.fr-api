@@ -1,5 +1,5 @@
 const errorHandler = require('../../utils/errorHandler');
-const hasTeamPaid = require('../../utils/hasTeamPaid');
+const hasTeamPaid = require('../../utils/hasTeamPaid.js');
 
 /**
  * Get a tournament specified by its id
@@ -20,22 +20,19 @@ const hasTeamPaid = require('../../utils/hasTeamPaid');
 
 const Get = (tournamentModel, teamModel, userModel) => async (req, res) => {
   try {
-    const tournament = await tournamentModel.findByPk(
-      req.params.tournamentId,
-      {
-        include: [
-          {
-            model: teamModel,
-            include: [
-              {
-                model: userModel,
-                attributes: ['id'],
-              },
-            ],
-          },
-        ],
-      },
-    );
+    const tournament = await tournamentModel.findByPk(req.params.tournamentId, {
+      include: [
+        {
+          model: teamModel,
+          include: [
+            {
+              model: userModel,
+              attributes: ['id'],
+            },
+          ],
+        },
+      ],
+    });
     let teams = await Promise.all(
       tournament.teams.map(async (team) => {
         let isPaid = true;

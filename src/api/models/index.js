@@ -43,6 +43,9 @@ module.exports = (sequelize) => {
     onDelete: 'cascade',
   });
 
+  User.hasMany(Info);
+  Info.belongsTo(User);
+
   User.hasMany(Message, {
     foreignKey: { allowNull: false },
     onDelete: 'cascade',
