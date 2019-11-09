@@ -24,9 +24,11 @@ const List = (userModel, teamModel, tournamentModel, cartModel, cartItemModel) =
   const limit = pageSize;
   const filterTournament = req.query.tournamentId === 'all' ? undefined : req.query.tournamentId;
   const filterStatus = req.query.status === 'all' ? undefined : req.query.status;
+  const filterScan = req.query.scan === 'all' ? undefined : req.query.scan;
+  const customScan = filterScan ? ` AND user.scanned IS ${filterScan}` : '';
   const customWhere = filterStatus && literal(
     filterStatus === 'paid' ?
-    'forUser.id IS NOT NULL' :
+    `forUser.id IS NOT NULL ${customScan}` :
     'forUser.id IS NULL'
   );
 
@@ -58,17 +60,13 @@ const List = (userModel, teamModel, tournamentModel, cartModel, cartItemModel) =
           model: cartModel,
           as: 'cart',
           attributes: [],
-          where: filterStatus === 'paid' && {
+          where: {
             transactionState: 'paid'
           },
         }
       ]
     };
-    const countUsers = await userModel.count({
-      include:  [includeTeam, includeCart],
-      where: customWhere,
-    });
-    const users = await userModel.findAll({
+    const {rows: users, count: countUsers} = await userModel.findAndCountAll({
       limit,
       offset,
       subQuery: false,
@@ -82,6 +80,7 @@ const List = (userModel, teamModel, tournamentModel, cartModel, cartItemModel) =
         'place',
         'permissions',
         'type',
+        'scanned'
       ],
       where: customWhere,
       order: [filterTournament ? [col('team.name'),'ASC'] : ['username', 'ASC']],
