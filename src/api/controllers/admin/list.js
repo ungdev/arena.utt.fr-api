@@ -17,7 +17,7 @@ const ITEM_VISITOR_ID = 2;
  * @param {object} teamModel model to query Infos
  * @param {object} tournamentModel model to query Infos
  */
-const List = (userModel, teamModel, tournamentModel, cartModel, cartItemModel) => async (req, res) => {
+const List = (userModel, teamModel, tournamentModel, cartModel, cartItemModel, itemModel) => async (req, res) => {
   const page = req.query.page || 0;
   const pageSize = 25;
   const offset = page * pageSize;
@@ -51,7 +51,7 @@ const List = (userModel, teamModel, tournamentModel, cartModel, cartItemModel) =
         attributes: ['shortName'],
       },
     };
-    const includeCart = {
+    const includePay = {
       model: cartItemModel,
       as: 'forUser',
       attributes: ['id'],
@@ -73,11 +73,28 @@ const List = (userModel, teamModel, tournamentModel, cartModel, cartItemModel) =
         }
       ]
     };
+    const includeCart = {
+      model: cartModel,
+      attributes: ['transactionId', 'paidAt'],
+      required: false,
+      separate: true,
+      where: {
+        transactionState: 'paid'
+      },
+      include: [{
+        model: cartItemModel,
+        attributes: ['quantity', 'refunded'],
+        include: [{
+          model: itemModel,
+          attributes: ['name']
+        }]
+      }]
+    }
     const {rows: users, count: countUsers} = await userModel.findAndCountAll({
       limit,
       offset,
       subQuery: false,
-      include: [includeCart, includeTeam],
+      include: [includePay, includeTeam, includeCart],
       attributes: [
         'id',
         'email',
@@ -91,6 +108,7 @@ const List = (userModel, teamModel, tournamentModel, cartModel, cartItemModel) =
       ],
       where: customWhere,
       order: [filterTournament ? [col('team.name'),'ASC'] : ['username', 'ASC']],
+      //group: ['username']
     });
 
     const formatUsers = users.map((user) => ({
@@ -105,7 +123,7 @@ const List = (userModel, teamModel, tournamentModel, cartModel, cartItemModel) =
         pageSize,
         offset,
         limit,
-        total: countUsers,
+        total: countUsers//.length,
       })
       .end();
   }

@@ -22,10 +22,10 @@ const ITEM_VISITOR_ID = 2;
  * @param {object} teamModel
  * @param {object} tournamentModel
  */
-const Search = (userModel, teamModel, tournamentModel, cartModel, cartItemModel) => async (request, response) => {
+const Search = (userModel, teamModel, tournamentModel, cartModel, cartItemModel, itemModel) => async (request, response) => {
   try {
     const { search } = request.query;
-    const includeCart = {
+    const includePay = {
       model: cartItemModel,
       as: 'forUser',
       attributes: ['id'],
@@ -47,7 +47,23 @@ const Search = (userModel, teamModel, tournamentModel, cartModel, cartItemModel)
         }
       ]
     };
-
+    const includeCart = {
+      model: cartModel,
+      attributes: ['transactionId', 'paidAt'],
+      required: false,
+      separate: true,
+      where: {
+        transactionState: 'paid'
+      },
+      include: [{
+        model: cartItemModel,
+        attributes: ['quantity', 'refunded'],
+        include: [{
+          model: itemModel,
+          attributes: ['name']
+        }]
+      }]
+    }
     const attributes = [
       'id',
       'email',
@@ -69,7 +85,7 @@ const Search = (userModel, teamModel, tournamentModel, cartModel, cartItemModel)
           model: tournamentModel,
           attributes: ['shortName'],
         },
-      }, includeCart]
+      }, includeCart, includePay]
     });
     const { count: countTeam, rows: usersTeam} = await userModel.findAndCountAll({
       attributes,
@@ -85,7 +101,7 @@ const Search = (userModel, teamModel, tournamentModel, cartModel, cartItemModel)
           model: tournamentModel,
           attributes: ['shortName'],
         },
-      }, includeCart]
+      }, includeCart, includePay]
     });
 
     const count = countUsers + countTeam;
