@@ -23,14 +23,21 @@ const List = (userModel, teamModel, tournamentModel, cartModel, cartItemModel) =
   const offset = page * pageSize;
   const limit = pageSize;
   const filterTournament = req.query.tournamentId === 'all' ? undefined : req.query.tournamentId;
-  const filterStatus = req.query.status === 'all' ? undefined : req.query.status;
   const filterScan = req.query.scan === 'all' ? undefined : req.query.scan;
   const customScan = filterScan ? ` AND user.scanned IS ${filterScan}` : '';
-  const customWhere = filterStatus && literal(
-    filterStatus === 'paid' ?
-    `forUser.id IS NOT NULL ${customScan}` :
-    'forUser.id IS NULL'
-  );
+  let customWhere = undefined;
+  switch (req.query.status) {
+    case 'paid':
+      customWhere = literal(`forUser.id IS NOT NULL ${customScan}`);
+      break;
+    case 'noPaid':
+      customWhere = literal('forUser.id IS NULL');
+      break;
+    case 'orga':
+      customWhere = literal('user.permissions IS NOT NULL');
+    default:
+      break;
+  }
 
   try {
     const includeTeam = {
