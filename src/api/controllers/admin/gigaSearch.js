@@ -1,9 +1,7 @@
+const { Op } = require('sequelize');
 const errorHandler = require('../../utils/errorHandler');
 const querySearch = require('../../utils/querySearch');
-const { Op } = require('sequelize');
-
-const ITEM_PLAYER_ID = 1;
-const ITEM_VISITOR_ID = 2;
+const { includePay, includeCart } = require('../../utils/customIncludes');
 
 /**
  * Get a user based on its id
@@ -25,45 +23,7 @@ const ITEM_VISITOR_ID = 2;
 const Search = (userModel, teamModel, tournamentModel, cartModel, cartItemModel, itemModel) => async (request, response) => {
   try {
     const { search } = request.query;
-    const includePay = {
-      model: cartItemModel,
-      as: 'forUser',
-      attributes: ['id'],
-      required: false,
-      where: {
-        [Op.or]: [
-          { itemId: ITEM_PLAYER_ID },
-          { itemId: ITEM_VISITOR_ID }
-        ],
-      },
-      include: [
-        {
-          model: cartModel,
-          as: 'cart',
-          attributes: [],
-          where: {
-            transactionState: 'paid'
-          },
-        }
-      ]
-    };
-    const includeCart = {
-      model: cartModel,
-      attributes: ['transactionId', 'paidAt'],
-      required: false,
-      separate: true,
-      where: {
-        transactionState: 'paid'
-      },
-      include: [{
-        model: cartItemModel,
-        attributes: ['quantity', 'refunded'],
-        include: [{
-          model: itemModel,
-          attributes: ['name']
-        }]
-      }]
-    }
+
     const attributes = [
       'id',
       'email',
@@ -75,33 +35,41 @@ const Search = (userModel, teamModel, tournamentModel, cartModel, cartItemModel,
       'type',
       'scanned'
     ];
-    const { count: countUsers, rows: usersFind} = await userModel.findAndCountAll({
+    const { count: countUsers, rows: usersFind } = await userModel.findAndCountAll({
       where: querySearch(search),
       attributes,
-      include: [{
-        model: teamModel,
-        attributes: ['name'],
-        include: {
-          model: tournamentModel,
-          attributes: ['shortName'],
+      include: [
+        {
+          model: teamModel,
+          attributes: ['name'],
+          include: {
+            model: tournamentModel,
+            attributes: ['shortName'],
+          },
         },
-      }, includeCart, includePay]
+        includeCart(cartModel, cartItemModel, itemModel),
+        includePay(cartItemModel, cartModel)
+      ]
     });
     const { count: countTeam, rows: usersTeam} = await userModel.findAndCountAll({
       attributes,
-      include: [{
-        model: teamModel,
-        attributes: ['name'],
-        where: {
-          name: {
-            [Op.like]: `%${search}%`,
-          }
+      include: [
+        {
+          model: teamModel,
+          attributes: ['name'],
+          where: {
+            name: {
+              [Op.like]: `%${search}%`,
+            }
+          },
+          include: {
+            model: tournamentModel,
+            attributes: ['shortName'],
+          },
         },
-        include: {
-          model: tournamentModel,
-          attributes: ['shortName'],
-        },
-      }, includeCart, includePay]
+        includeCart(cartModel, cartItemModel, itemModel),
+        includePay(cartItemModel, cartModel)
+      ]
     });
 
     const count = countUsers + countTeam;

@@ -1,8 +1,6 @@
-const { Op, literal, col } = require('sequelize');
+const { literal, col } = require('sequelize');
 const errorHandler = require('../../utils/errorHandler');
-
-const ITEM_PLAYER_ID = 1;
-const ITEM_VISITOR_ID = 2;
+const { includePay, includeCart } = require('../../utils/customIncludes');
 
 /**
  * GET /admin/users
@@ -51,50 +49,16 @@ const List = (userModel, teamModel, tournamentModel, cartModel, cartItemModel, i
         attributes: ['shortName'],
       },
     };
-    const includePay = {
-      model: cartItemModel,
-      as: 'forUser',
-      attributes: ['id'],
-      required: false,
-      where: {
-        [Op.or]: [
-          { itemId: ITEM_PLAYER_ID },
-          { itemId: ITEM_VISITOR_ID }
-        ],
-      },
-      include: [
-        {
-          model: cartModel,
-          as: 'cart',
-          attributes: [],
-          where: {
-            transactionState: 'paid'
-          },
-        }
-      ]
-    };
-    const includeCart = {
-      model: cartModel,
-      attributes: ['transactionId', 'paidAt'],
-      required: false,
-      separate: true,
-      where: {
-        transactionState: 'paid'
-      },
-      include: [{
-        model: cartItemModel,
-        attributes: ['quantity', 'refunded'],
-        include: [{
-          model: itemModel,
-          attributes: ['name']
-        }]
-      }]
-    }
+
     const {rows: users, count: countUsers} = await userModel.findAndCountAll({
       limit,
       offset,
       subQuery: false,
-      include: [includePay, includeTeam, includeCart],
+      include: [
+        includeTeam,
+        includeCart(cartModel, cartItemModel, itemModel),
+        includePay(cartItemModel, cartModel),
+      ],
       attributes: [
         'id',
         'email',
@@ -108,7 +72,6 @@ const List = (userModel, teamModel, tournamentModel, cartModel, cartItemModel, i
       ],
       where: customWhere,
       order: [filterTournament ? [col('team.name'),'ASC'] : ['username', 'ASC']],
-      //group: ['username']
     });
 
     const formatUsers = users.map((user) => ({
@@ -123,7 +86,7 @@ const List = (userModel, teamModel, tournamentModel, cartModel, cartItemModel, i
         pageSize,
         offset,
         limit,
-        total: countUsers//.length,
+        total: countUsers,
       })
       .end();
   }
