@@ -42,7 +42,7 @@ const UpdateUser = (userModel, userIdString) => async (req, res) => {
     }
 
     user.place = place || user.place;
-    user.permissions = permissions || user.permissions;
+    user.permissions = permissions !== 'none' && permissions || user.permissions;
     await user.save();
 
     return res.status(204).end();
