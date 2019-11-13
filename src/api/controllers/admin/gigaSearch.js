@@ -67,8 +67,8 @@ const Search = (userModel, teamModel, tournamentModel, cartModel, cartItemModel,
             attributes: ['shortName'],
           },
         },
-        includeCart(cartModel, cartItemModel, itemModel),
-        includePay(cartItemModel, cartModel)
+        includeCart(cartModel, cartItemModel, itemModel, userModel),
+        includePay(cartItemModel, cartModel, userModel)
       ]
     });
 

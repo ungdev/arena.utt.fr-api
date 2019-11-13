@@ -30,15 +30,12 @@ const includePay = (cartItemModel, cartModel, userModel) => ({
 
 const includeCart = (cartModel, cartItemModel, itemModel, userModel) => ({
   model: cartModel,
-  attributes: ['transactionId', 'paidAt'],
+  attributes: ['transactionId', 'paidAt', 'transactionState'],
   required: false,
   separate: true,
-  where: {
-    transactionState: 'paid'
-  },
   include: [{
     model: cartItemModel,
-    attributes: ['quantity', 'refunded'],
+    attributes: ['id','quantity', 'refunded'],
     include: [{
       model: itemModel,
       attributes: ['name']
