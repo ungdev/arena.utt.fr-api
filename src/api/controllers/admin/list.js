@@ -56,8 +56,8 @@ const List = (userModel, teamModel, tournamentModel, cartModel, cartItemModel, i
       subQuery: false,
       include: [
         includeTeam,
-        includeCart(cartModel, cartItemModel, itemModel),
-        includePay(cartItemModel, cartModel),
+        includeCart(cartModel, cartItemModel, itemModel, userModel),
+        includePay(cartItemModel, cartModel, userModel),
       ],
       attributes: [
         'id',

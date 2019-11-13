@@ -3,10 +3,10 @@ const { Op } = require('sequelize');
 const ITEM_PLAYER_ID = 1;
 const ITEM_VISITOR_ID = 2;
 
-const includePay = (cartItemModel, cartModel) => ({
+const includePay = (cartItemModel, cartModel, userModel) => ({
   model: cartItemModel,
   as: 'forUser',
-  attributes: ['id'],
+  attributes: ['id', 'itemId'],
   required: false,
   where: {
     [Op.or]: [
@@ -14,19 +14,21 @@ const includePay = (cartItemModel, cartModel) => ({
       { itemId: ITEM_VISITOR_ID }
     ],
   },
-  include: [
-    {
-      model: cartModel,
-      as: 'cart',
-      attributes: [],
-      where: {
-        transactionState: 'paid'
-      },
-    }
-  ]
+  include: [{
+    model: cartModel,
+    as: 'cart',
+    attributes: [],
+    where: {
+      transactionState: 'paid'
+    },
+  }, {
+    model: userModel,
+    as: 'userCart',
+    attributes: ['email', 'username']
+  }]
 });
 
-const includeCart = (cartModel, cartItemModel, itemModel) => ({
+const includeCart = (cartModel, cartItemModel, itemModel, userModel) => ({
   model: cartModel,
   attributes: ['transactionId', 'paidAt'],
   required: false,
@@ -40,6 +42,10 @@ const includeCart = (cartModel, cartItemModel, itemModel) => ({
     include: [{
       model: itemModel,
       attributes: ['name']
+    }, {
+      model: userModel,
+      as: 'forUser',
+      attributes: ['email', 'username']
     }]
   }]
 });
