@@ -1,6 +1,16 @@
 const { literal, col } = require('sequelize');
+const { check } = require('express-validator');
 const errorHandler = require('../../utils/errorHandler');
 const { includePay, includeCart } = require('../../utils/customIncludes');
+const validateBody = require('../../middlewares/validateBody');
+
+const CheckList = [
+  check('page').isInt().optional(),
+  check('tournamentId').optional(),
+  check('status').isIn(['all','paid','noPaid']).optional(),
+  check('scan').isIn(['all','true','false']).optional(),
+  validateBody(),
+];
 
 /**
  * GET /admin/users
@@ -95,4 +105,4 @@ const List = (userModel, teamModel, tournamentModel, cartModel, cartItemModel, i
   }
 };
 
-module.exports = List;
+module.exports = { List, CheckList };
