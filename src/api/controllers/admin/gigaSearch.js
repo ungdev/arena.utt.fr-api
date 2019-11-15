@@ -35,7 +35,7 @@ const Search = (userModel, teamModel, tournamentModel, cartModel, cartItemModel,
       'type',
       'scanned'
     ];
-    const { count: countUsers, rows: usersFind } = await userModel.findAndCountAll({
+    const usersFind = await userModel.findAndCountAll({
       where: querySearch(search),
       attributes,
       include: [
@@ -51,7 +51,7 @@ const Search = (userModel, teamModel, tournamentModel, cartModel, cartItemModel,
         includePay(cartItemModel, cartModel, userModel)
       ]
     });
-    const { count: countTeam, rows: usersTeam} = await userModel.findAndCountAll({
+    const usersTeam = await userModel.findAndCountAll({
       attributes,
       include: [
         {
@@ -72,8 +72,14 @@ const Search = (userModel, teamModel, tournamentModel, cartModel, cartItemModel,
       ]
     });
 
-    const count = countUsers + countTeam;
-    const users = [...usersTeam, ...usersFind];
+    let users = [...usersTeam.rows, ...usersFind.rows];
+
+    const uniqueUsers = {};
+    users.forEach((user) => {
+      uniqueUsers[user.email] = user;
+    });
+    users = Object.values(uniqueUsers);
+    const count = users.length;
 
     if (count === 0) {
       return response
