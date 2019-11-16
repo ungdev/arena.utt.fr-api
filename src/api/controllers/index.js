@@ -31,7 +31,7 @@ const MainRoutes = models => {
     resttrictToIp(['::1', 'awdawdawd']),
     Network(models)
   );
-  mainRouter.use('/admin', [isAuth()], Admin(models));
+  mainRouter.use('/admin', isAuth(), Admin(models));
   return mainRouter;
 };
 

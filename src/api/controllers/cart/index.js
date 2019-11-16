@@ -2,6 +2,7 @@ const Express = require('express');
 
 const etupay = require('../../utils/etupay');
 const isAuth = require('../../middlewares/isAuth');
+const hasPermission = require('../../middlewares/hasPermission');
 
 const CreateCart = require('./create');
 const DeleteItemFromCart = require('./delete');
@@ -20,6 +21,7 @@ const Cart = (models) => {
   router.put(
     `/:${cartId}`,
     isAuth(),
+    hasPermission('admin'),
     Refund(cartId, models.Cart),
   );
   router.delete(
