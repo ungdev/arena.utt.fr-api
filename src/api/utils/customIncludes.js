@@ -30,7 +30,7 @@ const includePay = (cartItemModel, cartModel, userModel) => ({
 
 const includeCart = (cartModel, cartItemModel, itemModel, userModel) => ({
   model: cartModel,
-  attributes: ['transactionId', 'paidAt', 'transactionState'],
+  attributes: ['id', 'transactionId', 'paidAt', 'transactionState'],
   required: false,
   separate: true,
   include: [{

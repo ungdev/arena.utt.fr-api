@@ -33,7 +33,7 @@ const List = (userModel, teamModel, tournamentModel, cartModel, cartItemModel, i
   const filterTournament = req.query.tournamentId === 'all' ? undefined : req.query.tournamentId;
   const filterScan = req.query.scan === 'all' ? undefined : req.query.scan;
   const customScan = filterScan ? ` AND user.scanned IS ${filterScan}` : '';
-  let customWhere = undefined;
+  let customWhere;
   switch (req.query.status) {
     case 'paid':
       customWhere = literal(`forUser.id IS NOT NULL ${customScan}`);
@@ -43,6 +43,7 @@ const List = (userModel, teamModel, tournamentModel, cartModel, cartItemModel, i
       break;
     case 'orga':
       customWhere = literal('user.permissions IS NOT NULL');
+      break;
     default:
       break;
   }
