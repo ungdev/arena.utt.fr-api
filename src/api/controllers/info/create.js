@@ -1,4 +1,5 @@
 const { check } = require('express-validator');
+const axios = require('axios');
 const validateBody = require('../../middlewares/validateBody');
 const errorHandler = require('../../utils/errorHandler');
 
@@ -28,6 +29,21 @@ const Create = (infoModel) => async (request, response) => {
       ...request.body,
       userId: request.user.id,
     });
+
+    axios.post('https://onesignal.com/api/v1/notifications', {
+      contents: {
+        "fr": request.body.content
+      },
+      headings: {
+        "fr": request.body.title
+      }
+    }, {
+      params: {
+        app_id: "4483353a-c200-40a6-9a59-1db5fd155363",
+        included_segments: ["Active Users"],
+        filters: [{ field: 'tag', key: 'tournamentId', relation: '=', value: request.body.tournamentId }]
+      }
+    })
 
     return response
       .status(201)
