@@ -13,19 +13,17 @@ const Entry = require('./entry');
 const Info = require('./info');
 const Network = require('./network');
 const Admin = require('./admin');
-const File = require('./files');
 
 const MainRoutes = models => {
   const mainRouter = Express.Router();
   mainRouter.use('/auth', Auth(models));
-  mainRouter.use('/users', isAuth(), User(models));
-  mainRouter.use('/tournaments', isAuth(), Tournament(models));
+  mainRouter.use('/users', [isAuth()], User(models));
+  mainRouter.use('/tournaments', [isAuth()], Tournament(models));
   mainRouter.use('/carts', Cart(models));
   mainRouter.use('/teams', isAuth(), Team(models));
   mainRouter.use('/items', isAuth(), Item(models));
   mainRouter.use('/entry', isAuth(), hasPermission('entry'), Entry(models));
   mainRouter.use('/infos', isAuth(), Info(models));
-  mainRouter.use('/files', File());
   mainRouter.use(
     '/network',
     resttrictToIp(['::1', 'awdawdawd']),
