@@ -74,17 +74,22 @@ const Search = (userModel, teamModel, tournamentModel, cartModel, cartItemModel,
 
     let users = [...usersTeam.rows, ...usersFind.rows];
 
+    // Remove duplicated users
     const uniqueUsers = {};
     users.forEach((user) => {
       uniqueUsers[user.email] = user;
     });
     users = Object.values(uniqueUsers);
+
+    // Sort users
+    users.sort((user1, user2) => user1.username > user2.username);
+
     const count = users.length;
 
     if (count === 0) {
       return response
         .status(404)
-        .json({ error: 'NOT_FOUND' })
+        .json({ error: 'USER_NOT_FOUND' })
         .end();
     }
 

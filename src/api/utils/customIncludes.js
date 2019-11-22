@@ -44,7 +44,8 @@ const includeCart = (cartModel, cartItemModel, itemModel, userModel) => ({
       as: 'forUser',
       attributes: ['email', 'username']
     }]
-  }]
+  }],
+  order: [['paidAt', 'ASC']],
 });
 
 module.exports = { includeCart, includePay };
