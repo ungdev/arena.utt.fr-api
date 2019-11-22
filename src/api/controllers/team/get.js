@@ -1,4 +1,5 @@
 const errorHandler = require('../../utils/errorHandler');
+const { APIToornament } = require('../../utils/APIToornament');
 
 const ticketId = 1;
 /**
@@ -28,6 +29,7 @@ const Get = (
       where: {
         id: teamId,
       },
+      attributes: ['id', 'captainId', 'name', 'toornamentId'],
       include: [
         {
           model: userModel,
@@ -35,6 +37,7 @@ const Get = (
         },
         {
           model: tournamentModel,
+          attributes: ['id', 'playersPerTeam', 'name', 'toornamentId']
         },
       ],
     });
@@ -42,6 +45,20 @@ const Get = (
     let askingUsers = await userModel.findAll({
       where: { askingTeamId: teamId },
     });
+
+    let matches = [];
+    if (team.toornamentId) {
+      const matchesToornament = await APIToornament.matches({ toornamentTeam: team.toornamentId, toornamentId: team.tournament.toornamentId });
+      matches = matchesToornament.data.map((match) => {
+        const formatOpponents = match.opponents.map((opponent) => ({
+          name: opponent.participant.name,
+          result: opponent.result,
+          score: opponent.score,
+        }));
+        return { opponents: formatOpponents, note: match.private_note, id: match.id }
+      })
+    }
+
     if (team) {
       const users = await Promise.all(
         team.users.map(async ({ id, username, email }) => {
@@ -69,7 +86,7 @@ const Get = (
       }));
       return res
         .status(200)
-        .json({ ...team.toJSON(), users, askingUsers })
+        .json({ ...team.toJSON(), users, askingUsers, matches })
         .end();
     }
     return res

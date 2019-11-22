@@ -5,8 +5,10 @@ process.env.NODE_ENV = 'production';
 
 require('dotenv').config();
 const debug = require('debug')('arena.utt.fr-api:bin');
+const { initiateAPI } = require('./src/api/utils/APIToornament');
 
 const main = async () => {
+    initiateAPI();
     const api = await require('./src')();
     api.listen(process.env.ARENA_API_PORT, () =>
         debug(
