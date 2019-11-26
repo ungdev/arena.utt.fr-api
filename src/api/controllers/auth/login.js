@@ -2,10 +2,13 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { Op } = require('sequelize');
 const { check } = require('express-validator');
+
 const log = require('../../utils/log.js')(module);
 const errorHandler = require('../../utils/errorHandler');
 const hasCartPaid = require('../../utils/hasCartPaid');
 const validateBody = require('../../middlewares/validateBody');
+const redis = require('../../utils/redis.js');
+const getIP = require('../../utils/getIP.js');
 
 const CheckLogin = [
   check('username').exists(),
@@ -42,7 +45,7 @@ const Login = (userModel, teamModel, cartModel, cartItemModel) => async (req, re
       },
       include: {
         model: teamModel,
-        attributes: ['id', 'name'],
+        attributes: ['id', 'name', 'tournamentId'],
       },
     });
 
@@ -82,6 +85,91 @@ const Login = (userModel, teamModel, cartModel, cartItemModel) => async (req, re
 
     log.info(`user ${user.username} logged`);
 
+    /********************/
+    /** Captive portal **/
+    /********************/
+    let captivePortalSuccess = false;
+    const ip = getIP(req);
+    const ipParts = ip.split('.').map((e) => parseInt(e));
+    const isInUnconnectedNetwork = (
+      ipParts[0] === 172 &&
+      ipParts[1] === 16 &&
+      (ipParts[2] >= 188 && ipParts[2] <= 191) &&
+      (ipParts[3] >= 0 && ipParts[3] <= 255)
+    );
+
+    const isValidPlayer = user.team && user.team.tournamentId !== 5 && user.place;
+    const isOrga = !!user.permissions;
+
+    if (isInUnconnectedNetwork) {
+      if (isValidPlayer || isOrga) {
+        await new Promise((resolve) => {
+          // Get MAC of the user from its IP
+          redis.get(ip, async (err, mac) => {
+            if (err || !mac) {
+              const error = !mac ? `no mac associated to ${ip} in redis` : JSON.stringify(err);
+              log.error(`captive portal error : ${error}`);
+              // Just quit this function and don't throw an error
+              resolve();
+              return;
+            }
+
+            let network;
+            if(isValidPlayer) {
+              switch(user.team.tournamentId) {
+                case 1:
+                case 2:
+                  network = 'lol';
+                  break;
+                case 3:
+                  network = 'fortnite';
+                  break;
+                case 4:
+                  network = 'csgo';
+                  break;
+                case 6:
+                  network = 'osu';
+                  break;
+                case 7:
+                  network = 'libre';
+                  break;
+              }
+            }
+            else if(isOrga) {
+              network = 'staff';
+            }
+
+            if(!network) {
+              return;
+            }
+
+            await new Promise((resolve) => {
+              // Associate to MAC: { network, firstname, lastname, username, email, place }
+              redis.set(
+                mac,
+                JSON.stringify({
+                  network,
+                  firstname: user.firstname,
+                  lastname: user.lastname,
+                  username: user.username,
+                  email: user.email,
+                  place: user.place,
+                }),
+                resolve,
+              );
+            });
+
+            captivePortalSuccess = true;
+            log.info(`captive portal successful for ${user.username}`);
+            resolve();
+          });
+        });
+      }
+      else {
+        log.warn('captive portal refused : not a valid player or orga');
+      }
+    }
+
     return res
       .status(200)
       .json({
@@ -91,12 +179,16 @@ const Login = (userModel, teamModel, cartModel, cartItemModel) => async (req, re
           firstname: user.firstname,
           lastname: user.lastname,
           email: user.email,
-          team: user.team,
+          team: user.team ? {
+            id: user.team && user.team.id,
+            name: user.team && user.team.name,
+          } : null,
           type: user.type,
           permissions: user.permissions,
           isPaid,
         },
         token,
+        captivePortalSuccess,
       })
       .end();
   }
