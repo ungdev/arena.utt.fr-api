@@ -1,5 +1,5 @@
 const errorHandler = require('../../utils/errorHandler');
-const log = require('../../utils/log')(module);
+const log = require('../../utils/log.js')(module);
 
 /**
  * Deletes a user from a team.
@@ -61,7 +61,7 @@ const DeleteUserFromTeam = (
     }
 
     if (user.team.captainId === userId) {
-      log.info("Can't delete captain user");
+      log.info('Can\'t delete captain user');
       return res
         .status(403)
         .json({ error: 'CAPTAIN' })

@@ -1,15 +1,15 @@
 const Express = require('express');
 
 const List = require('./list.js');
-const GetTeamsFromTournaments = require('./getTeams');
+const GetTeams = require('./getTeams.js');
 const Get = require('./get.js');
 
 const Tournament = (models) => {
   const router = Express.Router();
-  router.get('/', List(models.Tournament, models.Team, models.User));
+  router.get('/', List(models.Tournament, models.Team, models.User, models.CartItem, models.Cart));
   router.get(
     '/:tournamentId/teams',
-    GetTeamsFromTournaments(models.Team, models.User, models.Tournament),
+    GetTeams(models.Team, models.User, models.Tournament, models.CartItem, models.Cart),
   );
   router.get(
     '/:tournamentId',
