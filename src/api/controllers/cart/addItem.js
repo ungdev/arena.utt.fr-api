@@ -80,9 +80,11 @@ const AddItemToCart = (cartIdString, cartItemModel, userModel, cartModel, teamMo
       cartId,
     };
 
+    const itemId = parseInt(req.body.itemId);
+    const attributeId = parseInt(req.body.attributeId);
     // Attention: pas de verification d'attribute si ça peut correspondre à un itemId
     // Est-ce utile ?
-    if (req.body.itemId === ITEM_PLAYER_ID) {
+    if (itemId === ITEM_PLAYER_ID) {
       const forUser = await userModel.findByPk(req.body.forUserId, {
         include: [
           {
@@ -110,7 +112,6 @@ const AddItemToCart = (cartIdString, cartItemModel, userModel, cartModel, teamMo
       }
     }
 
-    const itemId = parseInt(req.body.itemId);
     if (itemId === ITEM_VISITOR_ID) {
       const visitorItem = await Item.findByPk(ITEM_VISITOR_ID);
 
@@ -143,13 +144,13 @@ const AddItemToCart = (cartIdString, cartItemModel, userModel, cartModel, teamMo
 
     if (itemId === ITEM_SHIRT_MALE_ID || itemId === ITEM_SHIRT_FEMALE_ID) {
       const maxTShirt = tshirtStocks.find(
-        (stock) => stock.attributeId === req.body.attributeId && stock.itemId === req.body.itemId,
+        (stock) => stock.attributeId === attributeId && stock.itemId === itemId,
       ).stock;
 
       const actualTShirt = await cartItemModel.sum('quantity', {
         where: {
           itemId,
-          attributeId: req.body.attributeId,
+          attributeId,
         },
         include: [
           {
