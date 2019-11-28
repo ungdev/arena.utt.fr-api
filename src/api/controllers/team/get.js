@@ -22,6 +22,7 @@ const Get = (
   tournamentModel,
   cartModel,
   cartItemModel,
+  infoModel,
 ) => async (req, res) => {
   const teamId = req.params[teamIdString];
   try {
@@ -57,7 +58,7 @@ const Get = (
         },
         {
           model: tournamentModel,
-          attributes: ['id', 'playersPerTeam', 'name', 'toornamentId']
+          attributes: ['id', 'playersPerTeam', 'name', 'toornamentId'],
         },
       ],
     });
@@ -67,6 +68,16 @@ const Get = (
     });
 
     let matches = [];
+    let lastStage;
+    let lastInfo;
+
+    if (!team) {
+      return res
+        .status(404)
+        .json({ error: 'NOT_FOUND' })
+        .end();
+    }
+
     if (team.toornamentId) {
       const matchesToornament = await APIToornament.matches({ toornamentTeam: team.toornamentId, toornamentId: team.tournament.toornamentId });
       matches = matchesToornament.data.map((match) => {
@@ -75,25 +86,28 @@ const Get = (
           result: opponent.result,
           score: opponent.score,
         }));
-        return { opponents: formatOpponents, note: match.private_note, id: match.id }
-      })
+        return { opponents: formatOpponents, note: match.private_note, id: match.id };
+      });
+      lastStage = matchesToornament.data[matchesToornament.data.length-1].stage_id;
+      lastInfo = await infoModel.findOne({
+        attributes: ['title','content'],
+        where: {
+          tournamentId: team.tournament.id,
+        },
+        order: [['createdAt', 'DESC']],
+      });
     }
 
-    if (team) {
-      const users = team.users.map((user) => ({ ...user.toJSON(), isPaid: user.forUser.length }));
-      askingUsers = askingUsers.map(({ username, email, id }) => ({
-        username,
-        email,
-        id,
-      }));
-      return res
-        .status(200)
-        .json({ ...team.toJSON(), users, askingUsers, matches })
-        .end();
-    }
+    const users = team.users.map((user) => ({ ...user.toJSON(), isPaid: user.forUser.length }));
+    askingUsers = askingUsers.map(({ username, email, id }) => ({
+      username,
+      email,
+      id,
+    }));
+
     return res
-      .status(404)
-      .json({ error: 'NOT_FOUND' })
+      .status(200)
+      .json({ ...team.toJSON(), users, askingUsers, matches, lastStage, lastInfo })
       .end();
   }
   catch (err) {
