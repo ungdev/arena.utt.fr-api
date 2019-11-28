@@ -19,17 +19,26 @@ const SendNotification = (title, content, params) => {
   );
 };
 
+/**
+ * Send a notification to all tournaments. if tournamentId is null, broadcast to all tournaments
+ * @param {string} title
+ * @param {string} content
+ * @param {string} tournamentId if null, broadcast to all tournaments
+ */
 const SendNotificationToTournament = (title, content, tournamentId) => {
   SendNotification(title, content, {
     included_segments: ['Active Users'],
-    filters: [
-      {
-        field: 'tag',
-        key: 'tournamentId',
-        relation: '=',
-        value: tournamentId,
-      },
-    ],
+    ...(tournamentId && {
+      //if tournamentId is null, don't put filter
+      filters: [
+        {
+          field: 'tag',
+          key: 'tournamentId',
+          relation: '=',
+          value: tournamentId,
+        },
+      ],
+    }),
   });
 };
 
