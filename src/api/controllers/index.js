@@ -1,6 +1,5 @@
 const Express = require('express');
 const isAuth = require('../middlewares/isAuth');
-const resttrictToIp = require('../middlewares/restrictToIP');
 const hasPermission = require('../middlewares/hasPermission');
 
 const Admin = require('./admin');
@@ -8,7 +7,6 @@ const Auth = require('./auth');
 const Cart = require('./cart');
 const Entry = require('./entry');
 const Info = require('./info');
-const Network = require('./network');
 const File = require('./files');
 const Item = require('./items');
 const Team = require('./team');
@@ -27,12 +25,6 @@ const MainRoutes = (models) => {
   mainRouter.use('/items', isAuth(), Item(models));
   mainRouter.use('/entry', isAuth(), hasPermission('entry'), Entry(models));
   mainRouter.use('/infos', isAuth(), Info(models));
-  mainRouter.use('/files', File());
-  mainRouter.use(
-    '/network',
-    resttrictToIp(['::1', 'awdawdawd']),
-    Network(models)
-  );
   mainRouter.use('/admin', isAuth(), Admin(models));
   return mainRouter;
 };
