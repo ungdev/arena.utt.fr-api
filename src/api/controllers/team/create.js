@@ -2,7 +2,7 @@ const { check } = require('express-validator');
 const validateBody = require('../../middlewares/validateBody');
 const errorHandler = require('../../utils/errorHandler');
 const { isTournamentFull } = require('../../utils/isFull');
-const log = require('../../utils/log')(module);
+const log = require('../../utils/log.js')(module);
 
 const CheckCreate = [
   check('teamName').isLength({ min: 3, max: 40 }),
@@ -27,20 +27,9 @@ const CheckCreate = [
  * @param {object} teamModel
  * @param {object} userModel
  */
-const Create = (tournamentModel, teamModel, userModel) => async (req, res) => {
+const Create = (tournamentModel, teamModel, userModel, cartItemModel, cartModel) => async (req, res) => {
   try {
-    const tournament = await tournamentModel.findByPk(
-      req.body.tournament,
-      {
-        include: [
-          {
-            model: teamModel,
-            include: [userModel],
-          },
-        ],
-      },
-    );
-    const tournamentFull = await isTournamentFull(tournament, req);
+    const [tournamentFull, tournament] = await isTournamentFull(req.body.tournament, userModel, teamModel, tournamentModel, cartItemModel, cartModel);
     if (tournamentFull) {
       return res
         .status(400)

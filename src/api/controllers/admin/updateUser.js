@@ -41,8 +41,12 @@ const UpdateUser = (userModel, userIdString) => async (req, res) => {
         .end();
     }
 
-    user.place = place || user.place;
-    user.permissions = permissions !== 'none' && permissions || user.permissions;
+    if(place !== undefined) {
+      user.place = place === '' ? null : place;
+    }
+    if(permissions !== undefined) {
+      user.permissions = permissions === '' ? null : permissions;
+    }
     await user.save();
 
     return res.status(204).end();

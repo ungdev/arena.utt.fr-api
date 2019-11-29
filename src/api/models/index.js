@@ -1,15 +1,12 @@
 module.exports = (sequelize) => {
-  const Attribute = sequelize.import(`${__dirname}/attribute`);
-  const Cart = sequelize.import(`${__dirname}/cart`);
-  const CartItem = sequelize.import(`${__dirname}/cartItem`);
-  const Info = sequelize.import(`${__dirname}/info`);
-  const Item = sequelize.import(`${__dirname}/item`);
-  const Message = sequelize.import(`${__dirname}/message`);
-  const Network = sequelize.import(`${__dirname}/network`);
-  const State = sequelize.import(`${__dirname}/state`);
-  const Team = sequelize.import(`${__dirname}/team`);
-  const Tournament = sequelize.import(`${__dirname}/tournament`);
-  const User = sequelize.import(`${__dirname}/user`);
+  const Attribute = sequelize.import(`${__dirname}/attribute.js`);
+  const Cart = sequelize.import(`${__dirname}/cart.js`);
+  const CartItem = sequelize.import(`${__dirname}/cartItem.js`);
+  const Info = sequelize.import(`${__dirname}/info.js`);
+  const Item = sequelize.import(`${__dirname}/item.js`);
+  const Team = sequelize.import(`${__dirname}/team.js`);
+  const Tournament = sequelize.import(`${__dirname}/tournament.js`);
+  const User = sequelize.import(`${__dirname}/user.js`);
 
   // Relations
 
@@ -25,15 +22,6 @@ module.exports = (sequelize) => {
     onDelete: 'cascade',
   });
 
-  Tournament.hasMany(State, {
-    foreignKey: { allowNull: false },
-    onDelete: 'cascade',
-  });
-  State.belongsTo(Tournament, {
-    foreignKey: { allowNull: false },
-    onDelete: 'cascade',
-  });
-
   Tournament.hasMany(Info, {
     foreignKey: { allowNull: true },
     onDelete: 'cascade',
@@ -45,15 +33,6 @@ module.exports = (sequelize) => {
 
   User.hasMany(Info);
   Info.belongsTo(User);
-
-  User.hasMany(Message, {
-    foreignKey: { allowNull: false },
-    onDelete: 'cascade',
-  });
-  Message.belongsTo(User, {
-    foreignKey: { allowNull: false },
-    onDelete: 'cascade',
-  });
 
   User.hasMany(Cart, {
     foreignKey: { allowNull: false },
@@ -82,9 +61,6 @@ module.exports = (sequelize) => {
     onDelete: 'cascade',
   });
 
-  User.hasOne(Network);
-  Network.belongsTo(User, {});
-
   CartItem.belongsTo(Attribute);
   Attribute.hasMany(CartItem);
 
@@ -102,7 +78,6 @@ module.exports = (sequelize) => {
   User.hasMany(CartItem, { foreignKey: 'forUserId', as: 'forUser' });
   User.hasMany(CartItem, { foreignKey: 'userId', as: 'userCart' });
   CartItem.belongsTo(User, { foreignKey: 'userId', as: 'userCart' });
-  Tournament.belongsTo(State, { as: 'index', constraints: false });
 
   return {
     Attribute,
@@ -110,9 +85,6 @@ module.exports = (sequelize) => {
     CartItem,
     Info,
     Item,
-    Message,
-    Network,
-    State,
     Team,
     Tournament,
     User,

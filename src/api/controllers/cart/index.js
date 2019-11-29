@@ -33,7 +33,7 @@ const Cart = (models) => {
     `/:${cartId}/add`,
     isAuth(),
     CheckAddItem,
-    AddItemToCart(cartId, models.CartItem, models.User, models.Cart),
+    AddItemToCart(cartId, models.CartItem, models.User, models.Cart, models.Team, models.Tournament, models.Item),
   );
   router.put(
     `/:${cartId}/cartItems/:${itemId}`,
@@ -41,7 +41,6 @@ const Cart = (models) => {
     CheckEdit,
     Edit(cartId, itemId, models.CartItem, models.User),
   );
-
   router.get(
     `/:${cartId}/cartItems/:${itemId}`,
     isAuth(),

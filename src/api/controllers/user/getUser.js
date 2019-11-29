@@ -20,7 +20,7 @@ const hasCartPaid = require('../../utils/hasCartPaid');
  * @param {object} cartModel
  * @param {object} cartItemModel
  */
-const Get = (userIdString, userModel, teamModel, cartModel, cartItemModel) => async (req, res) => {
+const GetUser = (userIdString, userModel, teamModel, cartModel, cartItemModel) => async (req, res) => {
   try {
     const userId = req.params[userIdString];
     const user = await userModel.findByPk(userId, {
@@ -33,6 +33,7 @@ const Get = (userIdString, userModel, teamModel, cartModel, cartItemModel) => as
         'askingTeamId',
         'type',
         'permissions',
+        'place',
       ],
       include: {
         model: teamModel,
@@ -58,4 +59,4 @@ const Get = (userIdString, userModel, teamModel, cartModel, cartItemModel) => as
   }
 };
 
-module.exports = Get;
+module.exports = GetUser;

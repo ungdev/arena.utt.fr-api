@@ -3,20 +3,22 @@ const isAuth = require('../middlewares/isAuth');
 const resttrictToIp = require('../middlewares/restrictToIP');
 const hasPermission = require('../middlewares/hasPermission');
 
+const Admin = require('./admin');
 const Auth = require('./auth');
 const Cart = require('./cart');
-const User = require('./user');
-const Tournament = require('./tournament');
-const Team = require('./team');
-const Item = require('./items');
 const Entry = require('./entry');
 const Info = require('./info');
 const Network = require('./network');
-const Admin = require('./admin');
 const File = require('./files');
+const Item = require('./items');
+const Team = require('./team');
+const Tournament = require('./tournament');
+const User = require('./user');
 
-const MainRoutes = models => {
+const MainRoutes = (models) => {
   const mainRouter = Express.Router();
+
+  mainRouter.use('/admin', isAuth(), Admin(models));
   mainRouter.use('/auth', Auth(models));
   mainRouter.use('/users', isAuth(), User(models));
   mainRouter.use('/tournaments', isAuth(), Tournament(models));

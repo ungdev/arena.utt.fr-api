@@ -1,14 +1,15 @@
-const { literal, col } = require('sequelize');
+const { col, Op } = require('sequelize');
 const { check } = require('express-validator');
 const errorHandler = require('../../utils/errorHandler');
 const { includePay, includeCart } = require('../../utils/customIncludes');
 const validateBody = require('../../middlewares/validateBody');
 
 const CheckList = [
-  check('page').isInt().optional(),
+  check('status').isIn(['all', 'player', 'visitor', 'orga']).optional(),
+  check('payment').isIn(['all','paid','noPaid']).optional(),
+  check('scan').isIn(['all', 'true', 'false']).optional(),
   check('tournamentId').optional(),
-  check('status').isIn(['all','paid','noPaid']).optional(),
-  check('scan').isIn(['all','true','false']).optional(),
+  check('page').isInt().optional(),
   validateBody(),
 ];
 
@@ -25,27 +26,30 @@ const CheckList = [
  * @param {object} teamModel model to query Infos
  * @param {object} tournamentModel model to query Infos
  */
-const List = (userModel, teamModel, tournamentModel, cartModel, cartItemModel, itemModel) => async (req, res) => {
+const List = (userModel, teamModel, tournamentModel, cartModel, cartItemModel, itemModel, attributeModel) => async (req, res) => {
   const page = req.query.page || 0;
-  const pageSize = 25;
-  const offset = page * pageSize;
-  const limit = pageSize;
+  const limit = 25;
+  const offset = page * limit;
   const filterTournament = req.query.tournamentId === 'all' ? undefined : req.query.tournamentId;
-  const filterScan = req.query.scan === 'all' ? undefined : req.query.scan;
-  const customScan = filterScan ? ` AND user.scanned IS ${filterScan}` : '';
-  let customWhere;
-  switch (req.query.status) {
-    case 'paid':
-      customWhere = literal(`forUser.id IS NOT NULL ${customScan}`);
-      break;
-    case 'noPaid':
-      customWhere = literal('forUser.id IS NULL');
-      break;
-    case 'orga':
-      customWhere = literal('user.permissions IS NOT NULL');
-      break;
-    default:
-      break;
+
+  const customWhere = [];
+  if(req.query.status !== undefined && req.query.status !== 'all') {
+    if(req.query.status === 'orga') {
+      customWhere.push({ permissions: { [Op.not]: null } });
+    }
+    else {
+      customWhere.push({
+        [Op.and]: [{
+          permissions: { [Op.is]: null },
+        },
+        {
+          type: req.query.status,
+        }],
+      });
+    }
+  }
+  if(req.query.scan !== undefined && req.query.scan !== 'all' && req.query.payment === 'paid') {
+    customWhere.push({ scanned: req.query.scan === 'true' ? 1 : 0 });
   }
 
   try {
@@ -61,15 +65,9 @@ const List = (userModel, teamModel, tournamentModel, cartModel, cartItemModel, i
       },
     };
 
-    const {rows: users, count: countUsers} = await userModel.findAndCountAll({
-      limit,
-      offset,
+    let { rows: users } = await userModel.findAndCountAll({
       subQuery: false,
-      include: [
-        includeTeam,
-        includeCart(cartModel, cartItemModel, itemModel, userModel),
-        includePay(cartItemModel, cartModel, userModel),
-      ],
+      where: customWhere,
       attributes: [
         'id',
         'email',
@@ -79,25 +77,35 @@ const List = (userModel, teamModel, tournamentModel, cartModel, cartItemModel, i
         'place',
         'permissions',
         'type',
-        'scanned'
+        'scanned',
       ],
-      where: customWhere,
-      order: [filterTournament ? [col('team.name'),'ASC'] : ['username', 'ASC']],
+      include: [
+        includeTeam,
+        includeCart(cartModel, cartItemModel, itemModel, userModel, attributeModel),
+        includePay(cartItemModel, cartModel, userModel),
+      ],
+      order: [[col('team.name'),'ASC'], ['username', 'ASC']],
     });
+
+    // Filter by payment
+    if(req.query.payment && req.query.payment !== 'all') {
+      users = users.filter((user) => req.query.payment === 'paid' ? user.forUser.length > 0 : user.forUser.length === 0);
+    }
+
+    // Offset and limit
+    const total = users.length;
+    users = users.slice(offset, offset + limit);
 
     const formatUsers = users.map((user) => ({
       ...user.toJSON(),
       isPaid: user.forUser.length,
-    }))
+    }));
 
     return res
       .status(200)
       .json({
         users: formatUsers,
-        pageSize,
-        offset,
-        limit,
-        total: countUsers,
+        total,
       })
       .end();
   }
