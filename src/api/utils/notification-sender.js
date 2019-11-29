@@ -1,18 +1,20 @@
 const axios = require('axios');
-const SendNotification = (title, content, params) => {
-  axios.post(
+const SendNotification = async (title, content, params) => {
+  await axios.post(
     'https://onesignal.com/api/v1/notifications',
     {
       contents: {
         fr: content,
+        en: content,
       },
       headings: {
         fr: title,
+        en: title,
       },
     },
     {
       params: {
-        app_id: '4483353a-c200-40a6-9a59-1db5fd155363',
+        app_id: process.env.ONESIGNAL_ID,
         ...params,
       },
     }

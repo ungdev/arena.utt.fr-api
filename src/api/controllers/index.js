@@ -7,7 +7,6 @@ const Auth = require('./auth');
 const Cart = require('./cart');
 const Entry = require('./entry');
 const Info = require('./info');
-const File = require('./files');
 const Item = require('./items');
 const Team = require('./team');
 const Tournament = require('./tournament');
