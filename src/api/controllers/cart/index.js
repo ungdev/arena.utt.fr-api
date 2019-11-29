@@ -6,11 +6,11 @@ const hasPermission = require('../../middlewares/hasPermission');
 
 const CreateCart = require('./create');
 const DeleteItemFromCart = require('./delete');
-const { AddItemToCart, CheckAddItem } = require('./add-item');
+const { AddItemToCart, CheckAddItem } = require('./addItem');
 const { Edit, CheckEdit } = require('./edit');
-const GetItemFromCart = require('./get-item-from-cart');
+const GetItemFromCart = require('./getItemFromCart');
 const Refund = require('./refund');
-const { SuccessfulPayment, EtupayAvailable } = require('./etupay.callback');
+const { SuccessfulPayment, EtupayAvailable } = require('./etupayCallback');
 
 const cartId = 'cartId';
 const itemId = 'itemId';
