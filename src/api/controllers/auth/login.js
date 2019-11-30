@@ -104,10 +104,13 @@ const Login = (userModel, teamModel, cartModel, cartItemModel) => async (req, re
     if (isInUnconnectedNetwork) {
       if (isValidPlayer || isOrga) {
         await new Promise((resolve) => {
+          // Replace dots in IP address by dashes
+          const userRedisIP = ip.replace(/\./g, '-');
+
           // Get MAC of the user from its IP
-          redis.get(ip, async (err, mac) => {
+          redis.get(userRedisIP, async (err, mac) => {
             if (err || !mac) {
-              const error = !mac ? `no mac associated to ${ip} in redis` : JSON.stringify(err);
+              const error = !mac ? `no mac associated to ${userRedisIP} in redis` : JSON.stringify(err);
               log.error(`captive portal error : ${error}`);
               // Just quit this function and don't throw an error
               resolve();
@@ -118,8 +121,10 @@ const Login = (userModel, teamModel, cartModel, cartItemModel) => async (req, re
             if(isValidPlayer) {
               switch(user.team.tournamentId) {
                 case 1:
+                  network = 'lol-pro';
+                  break;
                 case 2:
-                  network = 'lol';
+                  network = 'lol-amateur';
                   break;
                 case 3:
                   network = 'fortnite';
@@ -160,7 +165,7 @@ const Login = (userModel, teamModel, cartModel, cartItemModel) => async (req, re
             });
 
             captivePortalSuccess = true;
-            log.info(`captive portal successful for ${user.username}`);
+            log.info(`captive portal successful for ${user.username}, mac = ${mac}`);
             resolve();
           });
         });
