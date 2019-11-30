@@ -24,7 +24,7 @@ const MainRoutes = (models) => {
   mainRouter.use('/items', isAuth(), Item(models));
   mainRouter.use('/entry', isAuth(), hasPermission('entry'), Entry(models));
   mainRouter.use('/infos', isAuth(), Info(models));
-  mainRouter.use('/admin', isAuth(), Admin(models));
+
   return mainRouter;
 };
 
