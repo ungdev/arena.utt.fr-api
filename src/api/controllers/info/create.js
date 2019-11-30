@@ -49,7 +49,8 @@ const Create = (infoModel, sendNotificationToTournament) => async (
         },
       })
       .end();
-  } catch (error) {
+  }
+  catch (error) {
     return errorHandler(error, response);
   }
 };
