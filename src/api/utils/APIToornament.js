@@ -1,5 +1,6 @@
 const axios = require('axios');
-const qs = require('querystring')
+const qs = require('querystring');
+const log = require('./log')(module);
 
 let axiosToornament;
 
@@ -10,19 +11,24 @@ const initiateAPI = async () => {
     client_secret: process.env.TOORNAMENT_CLIENT_SECRET,
     scope: 'organizer:result',
   };
-  const resp = await axios.post('https://api.toornament.com/oauth/v2/token',
-    qs.stringify(data),
-    {
-      headers: { 'content-type': 'application/x-www-form-urlencoded' }
+  try {
+    const resp = await axios.post('https://api.toornament.com/oauth/v2/token',
+      qs.stringify(data),
+      { headers: { 'content-type': 'application/x-www-form-urlencoded' }},
+    );
+
+    axiosToornament = axios.create({
+      baseURL: 'https://api.toornament.com/organizer/v2/tournaments',
+      headers: {
+        'X-Api-Key': process.env.TOORNAMENT_KEY,
+        Authorization: `Bearer ${resp.data.access_token}`,
+        Range: 'matches=0-64',
+      },
     });
-  axiosToornament = axios.create({
-    baseURL: 'https://api.toornament.com/organizer/v2/tournaments',
-    headers: {
-      'X-Api-Key': process.env.TOORNAMENT_KEY,
-      Authorization: `Bearer ${resp.data.access_token}`,
-      Range: 'matches=0-64',
-    },
-  });
+  }
+  catch (err) {
+    log.error(`Failed to initiate toornament API : ${err}`);
+  }
 };
 
 const APIToornament = {
@@ -30,14 +36,14 @@ const APIToornament = {
     axiosToornament.get(`${toornamentId}/matches`, {
       params: {
         participant_ids: toornamentTeam,
-      }
+      },
     })
-    .then(res => {
-      resolve(res)
+    .then((res) => {
+      resolve(res);
     })
     .catch((err) => {
-      reject(err)
-    })
+      reject(err);
+    });
   }),
 };
 
