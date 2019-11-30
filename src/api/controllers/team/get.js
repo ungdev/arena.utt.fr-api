@@ -1,7 +1,6 @@
 const errorHandler = require('../../utils/errorHandler');
 const { APIToornament } = require('../../utils/APIToornament');
 
-const ticketId = 1;
 /**
  * Return the user's team. The user should be in the team, other wise
  * he cannot access this infos
@@ -79,7 +78,10 @@ const Get = (
     }
 
     if (team.toornamentId) {
-      const matchesToornament = await APIToornament.matches({ toornamentTeam: team.toornamentId, toornamentId: team.tournament.toornamentId });
+      const matchesToornament = await APIToornament.matches({
+        toornamentTeam: team.toornamentId,
+        toornamentId: team.tournament.toornamentId,
+      });
       matches = matchesToornament.data.map((match) => {
         const formatOpponents = match.opponents.map((opponent) => ({
           name: opponent.participant.name,

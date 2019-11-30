@@ -14,7 +14,7 @@ const initiateAPI = async () => {
   try {
     const resp = await axios.post('https://api.toornament.com/oauth/v2/token',
       qs.stringify(data),
-      { headers: { 'content-type': 'application/x-www-form-urlencoded' }},
+      { headers: { 'content-type': 'application/x-www-form-urlencoded' } },
     );
 
     axiosToornament = axios.create({
