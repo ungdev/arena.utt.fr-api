@@ -7,8 +7,8 @@ const log = require('../../utils/log.js')(module);
 const errorHandler = require('../../utils/errorHandler');
 const hasCartPaid = require('../../utils/hasCartPaid');
 const validateBody = require('../../middlewares/validateBody');
-const redis = require('../../utils/redis.js');
-const getIP = require('../../utils/getIP.js');
+const redis = require('../../utils/redis');
+const getIP = require('../../utils/getIP');
 
 const CheckLogin = [
   check('username').exists(),
