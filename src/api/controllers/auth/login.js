@@ -9,6 +9,7 @@ const hasCartPaid = require('../../utils/hasCartPaid');
 const validateBody = require('../../middlewares/validateBody');
 const redis = require('../../utils/redis');
 const getIP = require('../../utils/getIP');
+const hasOrgaPermission = require('../../utils/hasOrgaPermission');
 
 const CheckLogin = [
   check('username').exists(),
@@ -99,7 +100,8 @@ const Login = (userModel, teamModel, cartModel, cartItemModel) => async (req, re
     );
 
     const isValidPlayer = user.team && user.team.tournamentId !== 5 && user.place;
-    const isOrga = !!user.permissions;
+    const isOrga = hasOrgaPermission(user.permissions);
+    const isStreamer = user.permissions === 'stream';
 
     if (isInUnconnectedNetwork) {
       if (isValidPlayer || isOrga) {
@@ -121,10 +123,8 @@ const Login = (userModel, teamModel, cartModel, cartItemModel) => async (req, re
             if(isValidPlayer) {
               switch(user.team.tournamentId) {
                 case 1:
-                  network = 'lol-pro';
-                  break;
                 case 2:
-                  network = 'lol-amateur';
+                  network = 'lol';
                   break;
                 case 3:
                   network = 'fortnite';
@@ -139,9 +139,6 @@ const Login = (userModel, teamModel, cartModel, cartItemModel) => async (req, re
                   network = 'libre';
                   break;
               }
-            }
-            else if(isOrga) {
-              network = 'staff';
             }
 
             if(!network) {
@@ -159,6 +156,7 @@ const Login = (userModel, teamModel, cartModel, cartItemModel) => async (req, re
                   username: user.username,
                   email: user.email,
                   place: user.place,
+                  isStreamer,
                 }),
                 resolve,
               );
