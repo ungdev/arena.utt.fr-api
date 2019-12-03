@@ -101,7 +101,7 @@ const Login = (userModel, teamModel, cartModel, cartItemModel) => async (req, re
 
     const isValidPlayer = user.team && user.team.tournamentId !== 5 && user.place;
     const isOrga = hasOrgaPermission(user.permissions);
-    const isStreamer = user.permissions === 'stream';
+    const streamPermission = user.permissions === 'stream' ? '_stream' : '';
 
     if (isInUnconnectedNetwork) {
       if (isValidPlayer || isOrga) {
@@ -139,6 +139,10 @@ const Login = (userModel, teamModel, cartModel, cartItemModel) => async (req, re
                   network = 'libre';
                   break;
               }
+              network += streamPermission;
+            }
+            else if(isOrga) {
+              network = 'staff';
             }
 
             if(!network) {
@@ -156,7 +160,6 @@ const Login = (userModel, teamModel, cartModel, cartItemModel) => async (req, re
                   username: user.username,
                   email: user.email,
                   place: user.place,
-                  isStreamer,
                 }),
                 resolve,
               );
