@@ -32,7 +32,7 @@ const Team = (models) => {
   router.post(
     '/',
     [isNotInTeam(), CheckCreate],
-    Create(models.Tournament, models.Team, models.User),
+    Create(models.Tournament, models.Team, models.User, models.CartItem, models.Cart),
   );
   router.delete(
     `/:${teamId}`,
@@ -66,6 +66,7 @@ const Team = (models) => {
       models.Tournament,
       models.Cart,
       models.CartItem,
+      models.Info,
     ),
   );
 
