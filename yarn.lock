@@ -271,11 +271,6 @@ argparse@^1.0.7:
   dependencies:
     sprintf-js "~1.0.2"
 
-argv@0.0.2:
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/argv/-/argv-0.0.2.tgz#ecbd16f8949b157183711b1bda334f37840185ab"
-  integrity sha1-7L0W+JSbFXGDcRsb2jNPN4QBhas=
-
 arr-diff@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/arr-diff/-/arr-diff-4.0.0.tgz#d6461074febfec71e7e15235761a329a5dc7c520"
@@ -611,12 +606,10 @@ buffer-from@^1.0.0:
   resolved "https://registry.yarnpkg.com/buffer-from/-/buffer-from-1.1.1.tgz#32713bc028f75c02fdb710d7c7bcec1f2c6070ef"
   integrity sha512-MQcXEUbCKtEo7bhqEs6560Hyd4XaovZlO/k9V3hjVUF/zwW7KBVdSK4gIt/bzwS9MbR5qob+F5jusZsb0YQK2A==
 
-bwip-js@^1.7.3:
-  version "1.7.3"
-  resolved "https://registry.yarnpkg.com/bwip-js/-/bwip-js-1.7.3.tgz#ba1c05d84937ae7ad61a08623230c126129a94a0"
-  integrity sha512-KyXcXueGiNioK0osHs/de0E5H/cx95sUhePDAFPQbpbAXchA05VBD22l1/Fq3AglPFsXUnFLiND9gQK46alFCQ==
-  dependencies:
-    argv "0.0.2"
+bwip-js@^2.0.6:
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/bwip-js/-/bwip-js-2.0.6.tgz#2189bf1ae9518974a5d73513605939989a98a17e"
+  integrity sha512-25zupM+tgx6NGmrg0kFhdkddeQ5+QnUMvHbb7cPNVbBdFDd0SOG3xRZ1ocGDEamhmM+fStglCLEkH21OpD4Y/w==
 
 bytes@3.1.0:
   version "3.1.0"
